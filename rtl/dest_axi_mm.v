@@ -33,19 +33,21 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
 `timescale 1ns/100ps
 
 module dest_axi_mm #(
-
   parameter ID_WIDTH = 3,
   parameter DMA_DATA_WIDTH = 64,
-  parameter DMA_ADDR_WIDTH = 64,
+  parameter DMA_ADDR_WIDTH = 32,
   parameter BYTES_PER_BEAT_WIDTH = $clog2(DMA_DATA_WIDTH/8),
   parameter BEATS_PER_BURST_WIDTH = 4,
-  parameter MAX_BYTES_PER_BURST = 128,
-  parameter BYTES_PER_BURST_WIDTH = $clog2(MAX_BYTES_PER_BURST),
-  parameter AXI_LENGTH_WIDTH = 8,
-  parameter [3:0] AXI_AXCACHE = 4'b0011,
+  parameter BYTES_PER_BURST_WIDTH = 7,
+  parameter [3:0] AXI_AXCACHE = 4'b0000,
   parameter [2:0] AXI_AXPROT = 3'b000
 ) (
   input                               m_axi_aclk,
@@ -55,57 +57,54 @@ module dest_axi_mm #(
   output                              req_ready,
   input [DMA_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] req_address,
 
-  input                             bl_valid,
-  output                            bl_ready,
-  input [BEATS_PER_BURST_WIDTH-1:0] measured_last_burst_length,
+  input                               bl_valid,
+  output                              bl_ready,
+  input [BEATS_PER_BURST_WIDTH-1:0]   measured_last_burst_length,
 
   input                               enable,
   output                              enabled,
 
   output                              response_valid,
   input                               response_ready,
-  output [1:0]                        response_resp,
   output                              response_resp_eot,
-  output                              response_resp_partial,
   output [BYTES_PER_BURST_WIDTH-1:0]  response_data_burst_length,
 
-  input  [ID_WIDTH-1:0]             request_id,
-  output [ID_WIDTH-1:0]             response_id,
+  input  [ID_WIDTH-1:0]               request_id,
+  output [ID_WIDTH-1:0]               response_id,
 
-  output [ID_WIDTH-1:0]             address_id,
+  output [ID_WIDTH-1:0]               address_id,
   input                               address_eot,
   input                               response_eot,
 
   input                               fifo_valid,
   output                              fifo_ready,
-  input [DMA_DATA_WIDTH-1:0]        fifo_data,
+  input [DMA_DATA_WIDTH-1:0]          fifo_data,
   input [DMA_DATA_WIDTH/8-1:0]        fifo_strb,
   input                               fifo_last,
 
-  input [BYTES_PER_BURST_WIDTH-1:0] dest_burst_info_length,
-  input                             dest_burst_info_partial,
-  input [ID_WIDTH-1:0]              dest_burst_info_id,
-  input                             dest_burst_info_write,
+  input [BYTES_PER_BURST_WIDTH-1:0]   dest_burst_info_length,
+  input [ID_WIDTH-1:0]                dest_burst_info_id,
+  input                               dest_burst_info_write,
+
   // Write address
   input                               m_axi_awready,
   output                              m_axi_awvalid,
   output [DMA_ADDR_WIDTH-1:0]         m_axi_awaddr,
-  output [AXI_LENGTH_WIDTH-1:0]       m_axi_awlen,
+  output [7:0]                        m_axi_awlen,
   output [ 2:0]                       m_axi_awsize,
   output [ 1:0]                       m_axi_awburst,
   output [ 2:0]                       m_axi_awprot,
   output [ 3:0]                       m_axi_awcache,
 
   // Write data
-  output [DMA_DATA_WIDTH-1:0]     m_axi_wdata,
-  output [(DMA_DATA_WIDTH/8)-1:0] m_axi_wstrb,
+  output [DMA_DATA_WIDTH-1:0]         m_axi_wdata,
+  output [(DMA_DATA_WIDTH/8)-1:0]     m_axi_wstrb,
   input                               m_axi_wready,
   output                              m_axi_wvalid,
   output                              m_axi_wlast,
 
   // Write response
   input                               m_axi_bvalid,
-  input  [ 1:0]                       m_axi_bresp,
   output                              m_axi_bready
 );
 
@@ -116,7 +115,6 @@ module dest_axi_mm #(
     .BEATS_PER_BURST_WIDTH(BEATS_PER_BURST_WIDTH),
     .BYTES_PER_BEAT_WIDTH(BYTES_PER_BEAT_WIDTH),
     .DMA_DATA_WIDTH(DMA_DATA_WIDTH),
-    .LENGTH_WIDTH(AXI_LENGTH_WIDTH),
     .DMA_ADDR_WIDTH(DMA_ADDR_WIDTH),
     .AXI_AXCACHE(AXI_AXCACHE),
     .AXI_AXPROT(AXI_AXPROT)
@@ -162,7 +160,6 @@ module dest_axi_mm #(
     .resetn(m_axi_aresetn),
     .bvalid(m_axi_bvalid),
     .bready(m_axi_bready),
-    .bresp(m_axi_bresp),
 
     .enable(address_enabled),
     .enabled(enabled),
@@ -174,18 +171,16 @@ module dest_axi_mm #(
 
     .resp_valid(response_valid),
     .resp_ready(response_ready),
-    .resp_resp(response_resp),
     .resp_eot(response_resp_eot));
 
-  reg [BYTES_PER_BURST_WIDTH+1-1:0] bl_mem [0:2**(ID_WIDTH)-1];
+  // Byte length of each burst, looked up again when its write response returns
+  reg [BYTES_PER_BURST_WIDTH-1:0] bl_mem [0:2**(ID_WIDTH)-1];
 
-  assign {response_resp_partial,
-          response_data_burst_length} = bl_mem[response_id];
+  assign response_data_burst_length = bl_mem[response_id];
 
   always @(posedge m_axi_aclk) begin
     if (dest_burst_info_write) begin
-      bl_mem[dest_burst_info_id] <= {dest_burst_info_partial,
-                                     dest_burst_info_length};
+      bl_mem[dest_burst_info_id] <= dest_burst_info_length;
     end
   end
 

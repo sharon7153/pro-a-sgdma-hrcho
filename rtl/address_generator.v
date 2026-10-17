@@ -33,6 +33,11 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
 `timescale 1ns/100ps
 
 module address_generator #(
@@ -42,7 +47,6 @@ module address_generator #(
   parameter DMA_ADDR_WIDTH = 64,
   parameter BEATS_PER_BURST_WIDTH = 4,
   parameter BYTES_PER_BEAT_WIDTH = $clog2(DMA_DATA_WIDTH/8),
-  parameter LENGTH_WIDTH = 8,
   parameter [3:0] AXI_AXCACHE = 4'b0011,
   parameter [2:0] AXI_AXPROT = 3'b000
 ) (
@@ -68,7 +72,7 @@ module address_generator #(
   input                           addr_ready,
   output reg                      addr_valid,
   output     [DMA_ADDR_WIDTH-1:0] addr,
-  output     [LENGTH_WIDTH-1:0]   len,
+  output     [7:0]                len,
   output     [ 2:0]               size,
   output     [ 1:0]               burst,
   output     [ 2:0]               prot,
@@ -91,7 +95,7 @@ module address_generator #(
                 DMA_DATA_WIDTH ==   32 ? 3'b010 :
                 DMA_DATA_WIDTH ==   16 ? 3'b001 : 3'b000;
 
-  reg [LENGTH_WIDTH-1:0] length = 'h0;
+  reg [7:0] length = 'h0;
   reg [DMA_ADDR_WIDTH-BYTES_PER_BEAT_WIDTH-1:0] address = 'h00;
   reg [BEATS_PER_BURST_WIDTH-1:0] last_burst_len = 'h00;
   assign addr = {address, {BYTES_PER_BEAT_WIDTH{1'b0}}};

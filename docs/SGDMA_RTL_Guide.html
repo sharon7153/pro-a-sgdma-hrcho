@@ -220,7 +220,7 @@ footer{margin-top:56px;font-size:13px;color:var(--muted);border-top:1px solid va
 </tbody></table></div>
 <div class="col">
 <h3>ADI 코드에 적용된 패치 1건</h3>
-<p><code>scripts/import_adi_dmac.sh</code>가 ADI 원본을 복사한 뒤 <code>patches/0001-burst-memory-zero-replication.patch</code>를 적용합니다. 원본과의 차이는 이것 하나뿐입니다.</p>
+<p><code>rtl/axi_dmac_burst_memory.v</code>에 이미 반영되어 있습니다. ADI 원본과의 차이는 이것 하나뿐입니다 (출처: <code>licenses/adi_hdl/README.md</code>).</p>
 </div>
 <div class="tree"><span class="c">// axi_dmac_burst_memory.v</span>
 <span class="x">- reg [...] dest_burst_len_data = {DMA_LENGTH_ALIGN{1'b1}};</span>
@@ -495,7 +495,7 @@ assign dma_sg_in_req_valid  = ctrl_hwdesc ? req_valid_gated : 1'b0;</div>
 <div class="col">
 <h3>읽는 순서</h3>
 <ol class="steps">
-<li><code>rtl/sg_dma/sg_dma_top.v</code>의 파라미터 블록. 어떤 <code>generate</code>가 살아 있는지 먼저 정합니다 (3장 표).</li>
+<li><code>rtl/sg_dma_top.v</code>의 파라미터 블록. 어떤 <code>generate</code>가 살아 있는지 먼저 정합니다 (3장 표).</li>
 <li><code>dmac_sg.v</code> 전체. 독립적이고 짧아서 SG 개념을 RTL로 확인하기 가장 좋습니다. FSM → 필드 <code>case</code>문 → FIFO 3개 → splitter 순으로.</li>
 <li><code>axi_dmac_transfer.v</code>의 <code>i_dmac_sg</code> 인스턴스와 그 아래 <code>ctrl_hwdesc ?</code> MUX (<code>DMA_2D_TRANSFER</code>의 <code>else</code> 블록).</li>
 <li><code>axi_dmac_regmap.v</code>, <code>axi_dmac_regmap_request.v</code>에서 CONTROL, SUBMIT, SG_ADDRESS, IRQ 처리.</li>
@@ -520,7 +520,7 @@ assign dma_sg_in_req_valid  = ctrl_hwdesc ? req_valid_gated : 1'b0;</div>
 </div>
 </section>
 
-<footer>기준: sharon7153/pro-a-sgdma 커밋 0b0234b. ADI 코드는 hdl_2026_r1(b62abeff)에서 import_adi_dmac.sh로 복사되었고, burst_memory 패치 1건 외에는 원본과 같습니다.</footer>
+<footer>기준: sharon7153/pro-a-sgdma 커밋 0b0234b. ADI 코드는 hdl_2026_r1(b62abeff)에서 복사되었고, burst_memory 패치 1건 외에는 원본과 같습니다.</footer>
 </div>
 
 </body></html>

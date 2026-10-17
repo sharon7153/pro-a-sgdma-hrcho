@@ -5,7 +5,7 @@
 | 문서 ID | SGDMA-SFR-rel-v1.0.0 |
 | 작성일 | 2026-10-06 |
 | 작성자 | hrcho |
-| 대상 DUT | **`rtl/sg_dma/sg_dma_top.v`** (ADI `axi_dmac` 기반 SG DMA) |
+| 대상 DUT | **`rtl/sg_dma_top.v`** (ADI `axi_dmac` 기반 SG DMA) |
 | DUT 버전 | `VERSION` = `0x0004_0565` (4.05.65) |
 | HDL 출처 | `analogdevicesinc/hdl` `hdl_2026_r1` / `b62abeff` |
 | 기준 구성 | AXI-MM → AXI-MM / 단일 클록 / SG 활성 / 2D 비활성 / **`DMA_AXI_ADDR_WIDTH = 32`** / **`AXI_AXCACHE = 4'b0000`** |
@@ -1045,7 +1045,7 @@ Sanity `SAN-005`가 첫 번째 방식(마지막만 `0x3`)을 사용합니다. �
 
 | 항목 | 값 |
 |---|---|
-| 구현 | `tb/sg_dma/tb_sg_dma.sv` |
+| 구현 | `tb/tb_sg_dma.sv` |
 | 구성 | **TC 7건 / 체크 46건** |
 | 최종 실행 | **2026-10-06 — 46/46 PASS** |
 | 범위 | **회귀 게이트로 한정 (2026-10-06 팀 결정)** — [부록 D.3](#d3-결정-7의-재조정) |
@@ -1254,7 +1254,7 @@ HW 리셋 해제 직후, `CONTROL` 쓰기 전 상태입니다. **M = Sanity 실�
 
 # 부록 C — RTL 소스 위치
 
-`rtl/third_party/adi_hdl/library/axi_dmac/`
+`rtl/`
 
 | 파일 | 본 문서에서 인용한 내용 |
 |---|---|

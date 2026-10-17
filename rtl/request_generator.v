@@ -1,0 +1,139 @@
+// ***************************************************************************
+// ***************************************************************************
+// Copyright (C) 2014-2023 Analog Devices, Inc. All rights reserved.
+//
+// In this HDL repository, there are many different and unique modules, consisting
+// of various HDL (Verilog or VHDL) components. The individual modules are
+// developed independently, and may be accompanied by separate and unique license
+// terms.
+//
+// The user should read each of these license terms, and understand the
+// freedoms and responsibilities that he or she has by using this source/core.
+//
+// This core is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// Redistribution and use of source or resulting binaries, with or without modification
+// of this file, are permitted under one of the following two license terms:
+//
+//   1. The GNU General Public License version 2 as published by the
+//      Free Software Foundation, which can be found in the top level directory
+//      of this repository (LICENSE_GPL2), and also online at:
+//      <https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>
+//
+// OR
+//
+//   2. An ADI specific BSD license, which can be found in the top level directory
+//      of this repository (LICENSE_ADIBSD), and also on-line at:
+//      https://github.com/analogdevicesinc/hdl/blob/main/LICENSE_ADIBSD
+//      This will allow to generate bit files and not release the source code,
+//      as long as it attaches to an ADI device.
+//
+// ***************************************************************************
+// ***************************************************************************
+
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
+`timescale 1ns/100ps
+
+// Splits a transfer into bursts by handing out one burst ID per burst.
+module request_generator #(
+  parameter ID_WIDTH = 3,
+  parameter BURSTS_PER_TRANSFER_WIDTH = 17
+) (
+  input clk,
+  input resetn,
+
+  output [ID_WIDTH-1:0] request_id,
+  input [ID_WIDTH-1:0] response_id,
+
+  input req_valid,
+  output reg req_ready,
+  input [BURSTS_PER_TRANSFER_WIDTH-1:0] req_burst_count,
+
+  input enable,
+
+  output eot
+);
+
+  `include "inc_id.vh"
+
+  localparam STATE_IDLE      = 1'b0;
+  localparam STATE_GEN_ID    = 1'b1;
+
+  reg state = STATE_IDLE;
+  reg nx_state;
+
+  /*
+   * Here we only need to count the number of bursts, which means we can ignore
+   * the lower bits of the byte count. The last burst may not contain the
+   * maximum number of bytes, but the address_generator will take care that
+   * only the requested amount of bytes is transferred.
+   */
+
+  reg [BURSTS_PER_TRANSFER_WIDTH-1:0] burst_count = 'h00;
+  reg [ID_WIDTH-1:0] id;
+  wire [ID_WIDTH-1:0] id_next = inc_id(id);
+  wire incr_en;
+  wire incr_id;
+
+  assign eot = burst_count == 'h00;
+  assign request_id = id;
+
+  // Do not run ahead of the response side by more than the ID space allows
+  assign incr_en = (response_id != id_next) && (enable == 1'b1);
+  assign incr_id = (state == STATE_GEN_ID) && (incr_en == 1'b1);
+
+  always @(posedge clk) begin
+    if (state == STATE_IDLE) begin
+      burst_count <= req_burst_count;
+    end else if (incr_id == 1'b1) begin
+      burst_count <= burst_count - 1'b1;
+    end
+  end
+
+  always @(posedge clk) begin
+    if (resetn == 1'b0) begin
+      id <= 'h0;
+    end else if (incr_id == 1'b1) begin
+      id <= id_next;
+    end
+  end
+
+  always @(posedge clk) begin
+    if (resetn == 1'b0) begin
+      req_ready <= 1'b0;
+    end else begin
+      req_ready <= (nx_state == STATE_IDLE);
+    end
+  end
+
+  always @(*) begin
+    nx_state = state;
+    case (state)
+      STATE_IDLE: begin
+        if (req_valid == 1'b1) begin
+          nx_state = STATE_GEN_ID;
+        end
+      end
+      STATE_GEN_ID: begin
+        if (eot == 1'b1 && incr_en == 1'b1) begin
+          nx_state = STATE_IDLE;
+        end
+      end
+    endcase
+  end
+
+  always @(posedge clk) begin
+    if (resetn == 1'b0) begin
+      state <= STATE_IDLE;
+    end else begin
+      state <= nx_state;
+    end
+  end
+
+endmodule

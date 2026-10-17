@@ -33,27 +33,32 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
 `timescale 1ns/100ps
 
+// Scatter-Gather engine: fetches 48-byte hardware descriptors over m_axi
+// (6 x 64-bit beats) and hands {dest, src, length} to the transfer path.
+//
+//   +0x00 [63:32] id  [1:0] flags (bit0 LAST, bit1 EOT_IRQ)
+//   +0x08 dest address
+//   +0x10 src address
+//   +0x18 next descriptor address
+//   +0x20 [63:32] x_length (bytes - 1)   [31:0] unused (2D y_length)
+//   +0x28 unused (2D strides)
 module dmac_sg #(
-  parameter DMA_AXI_ADDR_WIDTH = 64,
-  parameter DMA_DATA_WIDTH = 64,
+  parameter DMA_AXI_ADDR_WIDTH = 32,
   parameter DMA_LENGTH_WIDTH = 24,
-  parameter AXI_LENGTH_WIDTH = 8,
-  parameter BYTES_PER_BEAT_WIDTH_DEST = 3,
-  parameter BYTES_PER_BEAT_WIDTH_SRC = 3,
-  parameter BYTES_PER_BEAT_WIDTH_SG = 3,
-  parameter ASYNC_CLK_REQ_SG = 1,
-  parameter [3:0] AXI_AXCACHE = 4'b0011,
+  parameter BYTES_PER_BEAT_WIDTH = 3,     // data path (src/dest) address alignment
+  parameter [3:0] AXI_AXCACHE = 4'b0000,
   parameter [2:0] AXI_AXPROT = 3'b000
 ) (
-  input req_clk,
-  input req_resetn,
-  input req_enable,
+  input clk,
+  input resetn,
 
-  output sg_clk,
-  input sg_resetn,
-  output sg_ext_resetn,
   input sg_enable,
   output sg_enabled,
 
@@ -66,36 +71,28 @@ module dmac_sg #(
   output resp_out_eot,
   input resp_in_valid,
 
-  input [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SG] req_desc_address,
+  input [DMA_AXI_ADDR_WIDTH-1:3] req_desc_address,
 
-  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_DEST] out_dest_address,
-  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SRC] out_src_address,
+  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] out_dest_address,
+  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] out_src_address,
   output [DMA_LENGTH_WIDTH-1:0] out_x_length,
-  output [DMA_LENGTH_WIDTH-1:0] out_y_length,
-  output [DMA_LENGTH_WIDTH-1:0] out_dest_stride,
-  output [DMA_LENGTH_WIDTH-1:0] out_src_stride,
   output [31:0] resp_out_id,
-
-  // Master AXI interface
-  input                            m_axi_aclk,
-  input                            m_axi_aresetn,
 
   // Read address
   input                            m_axi_arready,
   output                           m_axi_arvalid,
   output [DMA_AXI_ADDR_WIDTH-1:0]  m_axi_araddr,
-  output [AXI_LENGTH_WIDTH-1:0]    m_axi_arlen,
+  output [7:0]                     m_axi_arlen,
   output [ 2:0]                    m_axi_arsize,
   output [ 1:0]                    m_axi_arburst,
   output [ 2:0]                    m_axi_arprot,
   output [ 3:0]                    m_axi_arcache,
 
-  // Read data and response
-  input  [DMA_DATA_WIDTH-1:0]      m_axi_rdata,
+  // Read data (64-bit, RRESP is not checked)
+  input  [63:0]                    m_axi_rdata,
   input                            m_axi_rlast,
   output                           m_axi_rready,
-  input                            m_axi_rvalid,
-  input  [ 1:0]                    m_axi_rresp
+  input                            m_axi_rvalid
 );
 
   localparam STATE_IDLE = 0;
@@ -106,19 +103,15 @@ module dmac_sg #(
   localparam MASK_LAST_HWDESC = 1 << 0;
   localparam MASK_EOT_IRQ = 1 << 1;
 
-  localparam DMA_ADDRESS_WIDTH_DEST = DMA_AXI_ADDR_WIDTH - BYTES_PER_BEAT_WIDTH_DEST;
-  localparam DMA_ADDRESS_WIDTH_SRC = DMA_AXI_ADDR_WIDTH - BYTES_PER_BEAT_WIDTH_SRC;
-  localparam DMA_ADDRESS_WIDTH_SG = DMA_AXI_ADDR_WIDTH - BYTES_PER_BEAT_WIDTH_SG;
-  localparam DMA_DESCRIPTOR_WIDTH = DMA_ADDRESS_WIDTH_DEST + DMA_ADDRESS_WIDTH_SRC + 4*DMA_LENGTH_WIDTH;
+  localparam DMA_ADDRESS_WIDTH = DMA_AXI_ADDR_WIDTH - BYTES_PER_BEAT_WIDTH;
+  localparam DMA_ADDRESS_WIDTH_SG = DMA_AXI_ADDR_WIDTH - 3;
+  localparam DMA_DESCRIPTOR_WIDTH = 2*DMA_ADDRESS_WIDTH + DMA_LENGTH_WIDTH;
 
-  wire [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SG] first_desc_address;
-  reg [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_DEST] dest_addr;
-  reg [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SRC] src_addr;
-  reg [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SG] next_desc_addr;
+  wire [DMA_AXI_ADDR_WIDTH-1:3] first_desc_address;
+  reg [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] dest_addr;
+  reg [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] src_addr;
+  reg [DMA_AXI_ADDR_WIDTH-1:3] next_desc_addr;
   reg [DMA_LENGTH_WIDTH-1:0] x_length;
-  reg [DMA_LENGTH_WIDTH-1:0] y_length;
-  reg [DMA_LENGTH_WIDTH-1:0] dest_stride;
-  reg [DMA_LENGTH_WIDTH-1:0] src_stride;
 
   reg [1:0] hwdesc_state;
   reg [2:0] hwdesc_counter;
@@ -133,13 +126,9 @@ module dmac_sg #(
   wire fetch_ready;
   wire fifo_in_valid;
   wire fifo_in_ready;
-  wire fifo_out_valid;
-  wire fifo_out_ready;
   wire [32:0] fifo_in_data;
   wire [32:0] fifo_out_data;
 
-  assign sg_clk = m_axi_aclk;
-  assign sg_ext_resetn = m_axi_aresetn;
   assign sg_enabled = sg_enable | ~sg_in_ready;
 
   assign sg_in_ready = hwdesc_state == STATE_IDLE;
@@ -147,36 +136,30 @@ module dmac_sg #(
   assign m_axi_arvalid = hwdesc_state == STATE_SEND_ADDR;
   assign m_axi_rready = hwdesc_state == STATE_RECV_DESC;
 
+  // One INCR burst of 6 x 8 bytes per descriptor
   assign m_axi_arsize  = 3'h3;
   assign m_axi_arburst = 2'h1;
   assign m_axi_arprot  = AXI_AXPROT;
   assign m_axi_arcache = AXI_AXCACHE;
   assign m_axi_arlen   = 'h5;
-  assign m_axi_araddr  = {next_desc_addr, {BYTES_PER_BEAT_WIDTH_SG{1'b0}}};
+  assign m_axi_araddr  = {next_desc_addr, 3'b000};
 
+  // First descriptor address from SG_ADDRESS
   util_axis_fifo #(
     .DATA_WIDTH(DMA_ADDRESS_WIDTH_SG),
-    .ADDRESS_WIDTH(0),
-    .ASYNC_CLK(ASYNC_CLK_REQ_SG)
+    .ADDRESS_WIDTH(0)
   ) i_sg_addr_fifo (
-    .s_axis_aclk(req_clk),
-    .s_axis_aresetn(req_resetn),
+    .clk(clk),
+    .resetn(resetn),
     .s_axis_valid(req_in_valid),
     .s_axis_ready(req_in_ready),
-    .s_axis_full(),
     .s_axis_data(req_desc_address),
-    .s_axis_room(),
-
-    .m_axis_aclk(sg_clk),
-    .m_axis_aresetn(sg_resetn),
     .m_axis_valid(sg_in_valid),
     .m_axis_ready(sg_in_ready),
-    .m_axis_data(first_desc_address),
-    .m_axis_level(),
-    .m_axis_empty());
+    .m_axis_data(first_desc_address));
 
-  always @(posedge sg_clk) begin
-    if (sg_resetn == 1'b0) begin
+  always @(posedge clk) begin
+    if (resetn == 1'b0) begin
       hwdesc_counter <= 'h0;
     end else if (m_axi_rvalid) begin
       hwdesc_counter <= hwdesc_counter + 1'b1;
@@ -186,17 +169,14 @@ module dmac_sg #(
   end
 
   // Read the descriptor data
-  always @(posedge sg_clk) begin
-    if (sg_resetn == 1'b0) begin
+  always @(posedge clk) begin
+    if (resetn == 1'b0) begin
       hwdesc_flags <= 'h00;
       hwdesc_id <= 'h00;
       dest_addr <= 'h00;
       src_addr <= 'h00;
       next_desc_addr <= 'h00;
-      y_length <= 'h00;
       x_length <= 'h00;
-      src_stride <= 'h00;
-      dest_stride <= 'h00;
     end else begin
       if (sg_in_valid && sg_in_ready) begin
         next_desc_addr <= first_desc_address;
@@ -207,25 +187,18 @@ module dmac_sg #(
           hwdesc_id <= m_axi_rdata[63:32];
           hwdesc_flags <= m_axi_rdata[1:0];
           end
-        1: dest_addr <= m_axi_rdata[DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_DEST];
-        2: src_addr <= m_axi_rdata[DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SRC];
-        3: next_desc_addr <= m_axi_rdata[DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SG];
-        4: begin
-          x_length <= m_axi_rdata[63:32];
-          y_length <= m_axi_rdata[31:0];
-          end
-        5: begin
-          dest_stride <= m_axi_rdata[63:32];
-          src_stride <= m_axi_rdata[31:0];
-          end
+        1: dest_addr <= m_axi_rdata[DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH];
+        2: src_addr <= m_axi_rdata[DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH];
+        3: next_desc_addr <= m_axi_rdata[DMA_AXI_ADDR_WIDTH-1:3];
+        4: x_length <= m_axi_rdata[63:32];
         endcase
       end
     end
   end
 
   // Descriptor FSM
-  always @(posedge sg_clk) begin
-    if (sg_resetn == 1'b0) begin
+  always @(posedge clk) begin
+    if (resetn == 1'b0) begin
       hwdesc_state <= STATE_IDLE;
     end else begin
       case (hwdesc_state)
@@ -262,44 +235,31 @@ module dmac_sg #(
     end
   end
 
+  // Parsed descriptor -> transfer path
   util_axis_fifo #(
     .DATA_WIDTH(DMA_DESCRIPTOR_WIDTH),
-    .ADDRESS_WIDTH(0),
-    .ASYNC_CLK(ASYNC_CLK_REQ_SG)
+    .ADDRESS_WIDTH(0)
   ) i_sg_desc_fifo (
-    .s_axis_aclk(sg_clk),
-    .s_axis_aresetn(sg_resetn),
+    .clk(clk),
+    .resetn(resetn),
     .s_axis_valid(sg_out_valid),
     .s_axis_ready(sg_out_ready),
-    .s_axis_full(),
     .s_axis_data({
       dest_addr,
       src_addr,
-      x_length,
-      y_length,
-      dest_stride,
-      src_stride}),
-    .s_axis_room(),
-
-    .m_axis_aclk(req_clk),
-    .m_axis_aresetn(req_resetn),
+      x_length}),
     .m_axis_valid(req_out_valid),
     .m_axis_ready(req_out_ready),
     .m_axis_data({
       out_dest_address,
       out_src_address,
-      out_x_length,
-      out_y_length,
-      out_dest_stride,
-      out_src_stride}),
-    .m_axis_level(),
-    .m_axis_empty());
+      out_x_length}));
 
   splitter #(
     .NUM_M(2)
   ) i_req_splitter (
-    .clk(sg_clk),
-    .resetn(sg_resetn),
+    .clk(clk),
+    .resetn(resetn),
     .s_valid(fetch_valid),
     .s_ready(fetch_ready),
     .m_valid({
@@ -310,29 +270,22 @@ module dmac_sg #(
       fifo_in_ready}));
 
   assign fifo_in_data = {hwdesc_flags & MASK_EOT_IRQ ? 1'b1 : 1'b0, hwdesc_id};
-  assign fifo_out_ready = resp_in_valid;
   assign resp_out_eot = fifo_out_data[32];
   assign resp_out_id = fifo_out_data[31:0];
 
-  // Save the descriptor IDs and the eot descriptor flag in an async fifo
-  // Extract them one by one when the destination responds with an eot
+  // Save the descriptor IDs and the EOT_IRQ flag; pop one entry per completed
+  // descriptor (DESCRIPTOR_ID register shows the head)
   util_axis_fifo #(
     .DATA_WIDTH(33),
-    .ADDRESS_WIDTH(2),
-    .ASYNC_CLK(ASYNC_CLK_REQ_SG)
+    .ADDRESS_WIDTH(2)
   ) i_fifo (
-    .s_axis_aclk(sg_clk),
-    .s_axis_aresetn(sg_resetn),
-
+    .clk(clk),
+    .resetn(resetn),
     .s_axis_valid(fifo_in_valid),
     .s_axis_ready(fifo_in_ready),
     .s_axis_data(fifo_in_data),
-
-    .m_axis_aclk(req_clk),
-    .m_axis_aresetn(req_resetn),
-
-    .m_axis_valid(fifo_out_valid),
-    .m_axis_ready(fifo_out_ready),
+    .m_axis_valid(),
+    .m_axis_ready(resp_in_valid),
     .m_axis_data(fifo_out_data));
 
 endmodule

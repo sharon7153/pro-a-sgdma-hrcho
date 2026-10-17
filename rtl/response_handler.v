@@ -33,6 +33,11 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
 `timescale 1ns/100ps
 
 module response_handler #(
@@ -44,7 +49,6 @@ module response_handler #(
 
   input bvalid,
   output bready,
-  input [1:0] bresp,
 
   output reg [ID_WIDTH-1:0] id,
   input [ID_WIDTH-1:0] request_id,
@@ -56,14 +60,11 @@ module response_handler #(
 
   output resp_valid,
   input resp_ready,
-  output resp_eot,
-  output [1:0] resp_resp
+  output resp_eot
 );
 
-  `include "resp.vh"
   `include "inc_id.vh"
 
-  assign resp_resp = bresp;
   assign resp_eot = eot;
 
   wire active = id != request_id;

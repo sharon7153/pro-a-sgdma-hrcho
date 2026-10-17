@@ -33,68 +33,65 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
 `timescale 1ns/100ps
 
 module src_axi_mm #(
-
   parameter ID_WIDTH = 3,
   parameter DMA_DATA_WIDTH = 64,
-  parameter DMA_ADDR_WIDTH = 64,
+  parameter DMA_ADDR_WIDTH = 32,
   parameter BYTES_PER_BEAT_WIDTH = 3,
   parameter BEATS_PER_BURST_WIDTH = 4,
-  parameter AXI_LENGTH_WIDTH = 8,
-  parameter [3:0] AXI_AXCACHE = 4'b0011,
+  parameter [3:0] AXI_AXCACHE = 4'b0000,
   parameter [2:0] AXI_AXPROT = 3'b000
 ) (
-  input                           m_axi_aclk,
-  input                           m_axi_aresetn,
+  input                             m_axi_aclk,
+  input                             m_axi_aresetn,
 
-  input                           req_valid,
-  output                          req_ready,
+  input                             req_valid,
+  output                            req_ready,
   input [DMA_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] req_address,
   input [BEATS_PER_BURST_WIDTH-1:0] req_last_burst_length,
   input [BYTES_PER_BEAT_WIDTH-1:0]  req_last_beat_bytes,
 
-  input                            enable,
-  output reg                       enabled = 1'b0,
+  input                             enable,
+  output reg                        enabled = 1'b0,
 
-  output                           bl_valid,
-  input                            bl_ready,
+  output                            bl_valid,
+  input                             bl_ready,
   output [BEATS_PER_BURST_WIDTH-1:0] measured_last_burst_length,
-/*
-  output                          response_valid,
-  input                           response_ready,
-  output [1:0]                    response_resp,
-*/
 
-  input  [ID_WIDTH-1:0]            request_id,
-  output [ID_WIDTH-1:0]            response_id,
+  input  [ID_WIDTH-1:0]             request_id,
+  output [ID_WIDTH-1:0]             response_id,
 
-  output [ID_WIDTH-1:0]            data_id,
-  output [ID_WIDTH-1:0]            address_id,
-  input                            address_eot,
+  output [ID_WIDTH-1:0]             data_id,
+  output [ID_WIDTH-1:0]             address_id,
+  input                             address_eot,
 
-  output                           fifo_valid,
-  output [DMA_DATA_WIDTH-1:0]      fifo_data,
+  output                            fifo_valid,
+  output [DMA_DATA_WIDTH-1:0]       fifo_data,
   output [BYTES_PER_BEAT_WIDTH-1:0] fifo_valid_bytes,
-  output                           fifo_last,
+  output                            fifo_last,
 
   // Read address
-  input                            m_axi_arready,
-  output                           m_axi_arvalid,
-  output [DMA_ADDR_WIDTH-1:0]      m_axi_araddr,
-  output [AXI_LENGTH_WIDTH-1:0]    m_axi_arlen,
-  output [ 2:0]                    m_axi_arsize,
-  output [ 1:0]                    m_axi_arburst,
-  output [ 2:0]                    m_axi_arprot,
-  output [ 3:0]                    m_axi_arcache,
+  input                             m_axi_arready,
+  output                            m_axi_arvalid,
+  output [DMA_ADDR_WIDTH-1:0]       m_axi_araddr,
+  output [7:0]                      m_axi_arlen,
+  output [ 2:0]                     m_axi_arsize,
+  output [ 1:0]                     m_axi_arburst,
+  output [ 2:0]                     m_axi_arprot,
+  output [ 3:0]                     m_axi_arcache,
 
-  // Read data and response
-  input  [DMA_DATA_WIDTH-1:0]      m_axi_rdata,
-  output                           m_axi_rready,
-  input                            m_axi_rvalid,
-  input                            m_axi_rlast,
-  input  [ 1:0]                    m_axi_rresp
+  // Read data (RRESP is not checked)
+  input  [DMA_DATA_WIDTH-1:0]       m_axi_rdata,
+  output                            m_axi_rready,
+  input                             m_axi_rvalid,
+  input                             m_axi_rlast
 );
 
   `include "inc_id.vh"
@@ -149,7 +146,6 @@ module src_axi_mm #(
     .BEATS_PER_BURST_WIDTH(BEATS_PER_BURST_WIDTH),
     .BYTES_PER_BEAT_WIDTH(BYTES_PER_BEAT_WIDTH),
     .DMA_DATA_WIDTH(DMA_DATA_WIDTH),
-    .LENGTH_WIDTH(AXI_LENGTH_WIDTH),
     .DMA_ADDR_WIDTH(DMA_ADDR_WIDTH),
     .AXI_AXCACHE(AXI_AXCACHE),
     .AXI_AXPROT(AXI_AXPROT)
@@ -219,22 +215,5 @@ module src_axi_mm #(
       enabled <= 1'b0;
     end
   end
-
-  /* TODO
-  `include "resp.vh"
-
-  assign response_valid = 1'b0;
-  assign response_resp = RESP_OKAY;
-
-  reg [1:0] rresp;
-
-  always @(posedge m_axi_aclk)
-  begin
-    if (m_axi_rvalid && m_axi_rready) begin
-      if (m_axi_rresp != 2'b0)
-        rresp <= m_axi_rresp;
-    end
-  end
-  */
 
 endmodule

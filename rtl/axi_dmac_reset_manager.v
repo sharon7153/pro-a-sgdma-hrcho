@@ -33,15 +33,15 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
 `timescale 1ns/100ps
 
-module axi_dmac_reset_manager #(
-  parameter ASYNC_CLK_REQ_SRC = 1,
-  parameter ASYNC_CLK_SRC_DEST = 1,
-  parameter ASYNC_CLK_DEST_REQ = 1,
-  parameter ASYNC_CLK_REQ_SG = 1,
-  parameter DMA_SG_TRANSFER = 0
-) (
+// ENABLE / PAUSE sequencing and the internal DMA reset (single clock domain).
+module axi_dmac_reset_manager (
   input clk,
   input resetn,
 
@@ -49,38 +49,23 @@ module axi_dmac_reset_manager #(
   input ctrl_pause,
   input ctrl_hwdesc,
 
-  output req_resetn,
+  // Reset for every DMA-internal block (request, source, destination, SG)
+  output dma_resetn,
+
   output req_enable,
   input req_enabled,
 
-  input dest_clk,
-  input dest_ext_resetn,
-  output dest_resetn,
   output dest_enable,
   input dest_enabled,
 
-  input src_clk,
-  input src_ext_resetn,
-  output src_resetn,
   output src_enable,
   input src_enabled,
 
-  input sg_clk,
-  input sg_ext_resetn,
-  output sg_resetn,
   output sg_enable,
   input sg_enabled,
 
   output [11:0] dbg_status
 );
-
-  /*
-   * TODO:
-   * If an external reset is asserted for a domain that domain will go into reset
-   * immediately. If a transfer is currently active the transfer will be aborted
-   * and other domains will be shutdown gracefully. The reset manager will stay in
-   * the shutdown state until all external resets have been de-asserted.
-   */
 
   localparam STATE_DO_RESET = 3'h0;
   localparam STATE_RESET = 3'h1;
@@ -94,24 +79,23 @@ module axi_dmac_reset_manager #(
   reg do_reset = 1'b0;
   reg do_enable = 1'b0;
 
-  wire enabled_dest;
-  wire enabled_src;
-  wire enabled_sg;
-
   wire enabled_all;
   wire disabled_all;
 
-  generate if (DMA_SG_TRANSFER == 1) begin
-  assign enabled_all = req_enabled & enabled_src & enabled_dest & (enabled_sg | ~ctrl_hwdesc);
-  assign disabled_all = ~(req_enabled | enabled_src | enabled_dest | (enabled_sg & ctrl_hwdesc));
-  end else begin
-  assign enabled_all = req_enabled & enabled_src & enabled_dest;
-  assign disabled_all = ~(req_enabled | enabled_src | enabled_dest);
-  end endgenerate
+  // The SG engine only takes part when hardware descriptors are in use
+  assign enabled_all = req_enabled & src_enabled & dest_enabled & (sg_enabled | ~ctrl_hwdesc);
+  assign disabled_all = ~(req_enabled | src_enabled | dest_enabled | (sg_enabled & ctrl_hwdesc));
 
   assign req_enable = do_enable;
+  assign dest_enable = do_enable;
+  assign src_enable = do_enable;
+  assign sg_enable = do_enable;
 
-  assign dbg_status = {needs_reset,req_resetn,src_resetn,dest_resetn,sg_resetn,req_enabled,enabled_src,enabled_dest,enabled_sg,state};
+  // DBG_STATUS (0x43C): {needs_reset, req/src/dest/sg resetn, req/src/dest/sg enabled, state}
+  assign dbg_status = {needs_reset,
+                       dma_resetn, dma_resetn, dma_resetn, dma_resetn,
+                       req_enabled, src_enabled, dest_enabled, sg_enabled,
+                       state};
 
   always @(posedge clk) begin
     if (state == STATE_DO_RESET) begin
@@ -136,8 +120,7 @@ module axi_dmac_reset_manager #(
    * complete according to the interface semantics. Once a domain has completed
    * its transactions it will indicate that it has been shutdown. Once all domains
    * indicate that they have been disabled a reset pulse will be generated to all
-   * domains to clear all residual state. The reset pulse is long enough so that it
-   * is active in all domains for at least 4 clock cycles.
+   * domains to clear all residual state.
    *
    * Once the reset signal is de-asserted the DMA is in an idle state and can be
    * enabled again. If the DMA receives a enable while it is performing a shutdown
@@ -147,7 +130,6 @@ module axi_dmac_reset_manager #(
    * If ctrl_pause is asserted all domains will be disabled. But there will be no
    * reset, so when the ctrl_pause signal is de-asserted again the DMA will resume
    * with its previous state.
-   *
    */
 
   /*
@@ -178,7 +160,7 @@ module axi_dmac_reset_manager #(
          * ctrl_enable == 1'b0, otherwise we'd go through the reset sequence
          * again and again.
          */
-        if (ctrl_enable == 1'b1 && req_resetn == 1'b1) begin
+        if (ctrl_enable == 1'b1 && dma_resetn == 1'b1) begin
           state <= STATE_DISABLED;
         end
       end
@@ -211,136 +193,34 @@ module axi_dmac_reset_manager #(
   end
 
   /*
-   * Chain the reset through all clock domains. This makes sure that is asserted
-   * for at least 4 clock cycles of the slowest domain, no matter what. If
-   * successive domains have the same clock they'll share their reset signal.
+   * Reset pulse generator: do_reset asynchronously loads a 4-stage shift
+   * register; once it drains, the reset is released through a 2-stage
+   * synchronizer. The internal reset is therefore asserted for several cycles.
    */
+  reg [3:0] reset_async = 4'b1111;
+  reg [1:0] reset_sync = 2'b11;
+  reg reset_sync_in = 1'b1;
 
-  localparam NUM_RESET_LINKS = DMA_SG_TRANSFER ? 4 : 3;
-  localparam GEN_ASYNC_RESET = {
-    ASYNC_CLK_REQ_SG ? 1'b1 : 1'b0,
-    ASYNC_CLK_REQ_SRC ? 1'b1 : 1'b0,
-    ASYNC_CLK_SRC_DEST ? 1'b1 : 1'b0,
-    1'b1
-  };
-
-  wire [NUM_RESET_LINKS:0] reset_async_chain;
-  wire [NUM_RESET_LINKS:0] reset_sync_chain;
-  wire [3:0] reset_chain_clks = {sg_clk, clk, src_clk, dest_clk};
-
-  assign reset_async_chain[0] = 1'b0;
-  assign reset_sync_chain[0] = reset_async_chain[3];
-
-  generate
-  genvar i;
-
-  for (i = 0; i < NUM_RESET_LINKS; i = i + 1) begin: reset_gen
-
-    if (GEN_ASYNC_RESET[i] == 1'b1) begin
-
-      reg [3:0] reset_async = 4'b1111;
-      reg [1:0] reset_sync = 2'b11;
-      reg reset_sync_in = 1'b1;
-
-      always @(posedge reset_chain_clks[i] or posedge reset_sync_chain[i]) begin
-        if (reset_sync_chain[i] == 1'b1) begin
-          reset_sync_in <= 1'b1;
-        end else begin
-          reset_sync_in <= reset_async[0];
-        end
-      end
-
-      always @(posedge reset_chain_clks[i] or posedge do_reset) begin
-        if (do_reset == 1'b1) begin
-          reset_async <= 4'b1111;
-        end else begin
-          reset_async <= {reset_async_chain[i], reset_async[3:1]};
-        end
-      end
-
-      always @(posedge reset_chain_clks[i]) begin
-        reset_sync <= {reset_sync_in,reset_sync[1]};
-      end
-
-      assign reset_async_chain[i+1] = reset_async[0];
-      assign reset_sync_chain[i+1] = reset_sync[0];
-
+  always @(posedge clk or posedge reset_async[0]) begin
+    if (reset_async[0] == 1'b1) begin
+      reset_sync_in <= 1'b1;
     end else begin
-      assign reset_async_chain[i+1] = reset_async_chain[i];
-      assign reset_sync_chain[i+1] = reset_sync_chain[i];
+      reset_sync_in <= reset_async[0];
     end
   end
 
-  endgenerate
+  always @(posedge clk or posedge do_reset) begin
+    if (do_reset == 1'b1) begin
+      reset_async <= 4'b1111;
+    end else begin
+      reset_async <= {1'b0, reset_async[3:1]};
+    end
+  end
 
-  /* De-assertions in the opposite direction of the data flow: dest, src, request */
-  assign dest_resetn = ~reset_sync_chain[1];
-  assign src_resetn = ~reset_sync_chain[2];
-  assign req_resetn = ~reset_sync_chain[3];
-  generate if (DMA_SG_TRANSFER == 1) begin
-  assign sg_resetn = ~reset_sync_chain[4];
-  end else begin
-  assign sg_resetn = 1'b0;
-  end endgenerate
+  always @(posedge clk) begin
+    reset_sync <= {reset_sync_in, reset_sync[1]};
+  end
 
-  sync_bits #(
-    .NUM_OF_BITS (1),
-    .ASYNC_CLK (ASYNC_CLK_DEST_REQ)
-  ) i_sync_control_dest (
-    .out_clk (dest_clk),
-    .out_resetn (1'b1),
-    .in_bits (do_enable),
-    .out_bits (dest_enable));
-
-  sync_bits #(
-    .NUM_OF_BITS (1),
-    .ASYNC_CLK (ASYNC_CLK_DEST_REQ)
-  ) i_sync_status_dest (
-    .out_clk (clk),
-    .out_resetn (1'b1),
-    .in_bits (dest_enabled),
-    .out_bits (enabled_dest));
-
-  sync_bits #(
-    .NUM_OF_BITS (1),
-    .ASYNC_CLK (ASYNC_CLK_REQ_SRC)
-  ) i_sync_control_src (
-    .out_clk (src_clk),
-    .out_resetn (1'b1),
-    .in_bits (do_enable),
-    .out_bits (src_enable));
-
-  sync_bits #(
-    .NUM_OF_BITS (1),
-    .ASYNC_CLK (ASYNC_CLK_REQ_SRC)
-  ) i_sync_status_src (
-    .out_clk (clk),
-    .out_resetn (1'b1),
-    .in_bits (src_enabled),
-    .out_bits (enabled_src));
-
-  generate if (DMA_SG_TRANSFER == 1) begin
-  sync_bits #(
-    .NUM_OF_BITS (1),
-    .ASYNC_CLK (ASYNC_CLK_REQ_SG)
-  ) i_sync_control_sg (
-    .out_clk (sg_clk),
-    .out_resetn (1'b1),
-    .in_bits (do_enable),
-    .out_bits (sg_enable));
-
-  sync_bits #(
-    .NUM_OF_BITS (1),
-    .ASYNC_CLK (ASYNC_CLK_REQ_SG)
-  ) i_sync_status_sg (
-    .out_clk (clk),
-    .out_resetn (1'b1),
-    .in_bits (sg_enabled),
-    .out_bits (enabled_sg));
-
-  end else begin
-  assign sg_enable = 1'b0;
-  assign enabled_sg = 1'b0;
-  end endgenerate
+  assign dma_resetn = ~reset_sync[0];
 
 endmodule

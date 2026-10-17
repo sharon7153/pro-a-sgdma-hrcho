@@ -1,7 +1,7 @@
-Running: xsim.dir/tb_sg_dma_snap/xsimk -runall -simmode gui -wdb tb_sg_dma_snap.wdb -simrunnum 0 -socket 34335
+Running: xsim.dir/tb_sg_dma_snap/xsimk -runall -simmode gui -wdb tb_sg_dma_snap.wdb -simrunnum 0 -socket 56591
 Design successfully loaded
-Design Loading Memory Usage: 176852 KB (Peak: 176860 KB)
+Design Loading Memory Usage: 176588 KB (Peak: 176596 KB)
 Design Loading CPU Usage: 750 ms
 Simulation completed
-Simulation Memory Usage: 267896 KB (Peak: 316120 KB)
+Simulation Memory Usage: 267476 KB (Peak: 315856 KB)
 Simulation CPU Usage: 760 ms

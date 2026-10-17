@@ -33,46 +33,23 @@
 // ***************************************************************************
 // ***************************************************************************
 
+// Modified for sg_dma (2026-10-17): reduced to the SG, AXI-MM -> AXI-MM,
+// single-clock configuration. Unused interfaces, parameters and
+// generate branches of the original ADI module were removed.
+// ***************************************************************************
+
 `timescale 1ns/100ps
 
+// AXI4-Lite register map: identification, interrupts, control and debug
+// registers. Transfer registers live in axi_dmac_regmap_request.
 module axi_dmac_regmap #(
   parameter ID = 0,
-  parameter DISABLE_DEBUG_REGISTERS = 0,
-  parameter BYTES_PER_BEAT_WIDTH_DEST = 1,
-  parameter BYTES_PER_BEAT_WIDTH_SRC = 1,
-  parameter BYTES_PER_BEAT_WIDTH_SG = 1,
+  parameter BYTES_PER_BEAT_WIDTH = 3,
   parameter BYTES_PER_BURST_WIDTH = 7,
-  parameter DMA_TYPE_DEST = 0,
-  parameter DMA_TYPE_SRC = 2,
-  parameter DMA_AXI_ADDR_WIDTH = 64,
+  parameter DMA_AXI_ADDR_WIDTH = 32,
   parameter DMA_LENGTH_WIDTH = 24,
-  parameter DMA_LENGTH_ALIGN = 3,
-  parameter DMA_CYCLIC = 0,
-  parameter HAS_DEST_ADDR = 1,
-  parameter HAS_SRC_ADDR = 1,
-  parameter DMA_2D_TRANSFER = 0,
-  parameter DMA_SG_TRANSFER = 0,
-  parameter SYNC_TRANSFER_START = 0,
-  parameter CACHE_COHERENT = 0,
-  parameter [3:0] AXI_AXCACHE = 4'b0011,
-  parameter [2:0] AXI_AXPROT = 3'b000,
-  parameter FRAMELOCK = 0,
-  parameter DMA_2D_TLAST_MODE = 0,
-  parameter MAX_NUM_FRAMES_WIDTH = 3,
-  parameter USE_EXT_SYNC = 0,
-  parameter AUTORUN = 0,
-  parameter AUTORUN_FLAGS = 0,
-  parameter AUTORUN_SRC_ADDR = 0,
-  parameter AUTORUN_DEST_ADDR = 0,
-  parameter AUTORUN_X_LENGTH = 0,
-  parameter AUTORUN_Y_LENGTH = 0,
-  parameter AUTORUN_SRC_STRIDE = 0,
-  parameter AUTORUN_DEST_STRIDE = 0,
-  parameter AUTORUN_SG_ADDRESS = 0,
-  parameter AUTORUN_FRAMELOCK_CONFIG = 0,
-  parameter AUTORUN_FRAMELOCK_STRIDE = 0,
-  parameter AUTORUN_CONTROL_HWDESC = AUTORUN ? AUTORUN_FLAGS[3] : 0,
-  parameter AUTORUN_CONTROL_FLOCK  = AUTORUN ? AUTORUN_FLAGS[4] : 0
+  parameter [3:0] AXI_AXCACHE = 4'b0000,
+  parameter [2:0] AXI_AXPROT = 3'b000
 ) (
 
   // Slave AXI interface
@@ -82,7 +59,6 @@ module axi_dmac_regmap #(
   input s_axi_awvalid,
   output s_axi_awready,
   input [10:0] s_axi_awaddr,
-  input [2:0] s_axi_awprot,
 
   input s_axi_wvalid,
   output s_axi_wready,
@@ -96,7 +72,6 @@ module axi_dmac_regmap #(
   input s_axi_arvalid,
   output s_axi_arready,
   input [10:0] s_axi_araddr,
-  input [2:0] s_axi_arprot,
 
   output s_axi_rvalid,
   input s_axi_rready,
@@ -107,35 +82,22 @@ module axi_dmac_regmap #(
   output reg irq,
 
   // Control interface
-  output reg ctrl_enable = AUTORUN == 1,
+  output reg ctrl_enable = 1'b0,
   output reg ctrl_pause = 1'b0,
-  output reg ctrl_hwdesc = AUTORUN_CONTROL_HWDESC,
-  output reg ctrl_flock = AUTORUN_CONTROL_FLOCK,
+  output reg ctrl_hwdesc = 1'b0,
 
   // DMA request interface
   output request_valid,
   input request_ready,
-  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_DEST] request_dest_address,
-  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SRC] request_src_address,
-  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH_SG] request_sg_address,
+  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] request_dest_address,
+  output [DMA_AXI_ADDR_WIDTH-1:BYTES_PER_BEAT_WIDTH] request_src_address,
+  output [DMA_AXI_ADDR_WIDTH-1:3] request_sg_address,
   output [DMA_LENGTH_WIDTH-1:0] request_x_length,
-  output [DMA_LENGTH_WIDTH-1:0] request_y_length,
-  output [DMA_LENGTH_WIDTH-1:0] request_dest_stride,
-  output [DMA_LENGTH_WIDTH-1:0] request_src_stride,
-  output [MAX_NUM_FRAMES_WIDTH-1:0] request_flock_framenum,
-  output                            request_flock_mode,
-  output                            request_flock_wait_writer,
-  output [MAX_NUM_FRAMES_WIDTH-1:0] request_flock_distance,
-  output [DMA_AXI_ADDR_WIDTH-1:0] request_flock_stride,
-  output request_sync_transfer_start,
-  output request_last,
-  output request_cyclic,
 
   // DMA response interface
   input response_eot,
   input [31:0] response_sg_desc_id,
   input [BYTES_PER_BURST_WIDTH-1:0] response_measured_burst_length,
-  input response_partial,
   input response_valid,
   output response_ready,
 
@@ -151,7 +113,19 @@ module axi_dmac_regmap #(
   localparam HAS_ADDR_HIGH = DMA_AXI_ADDR_WIDTH > 32;
   localparam ADDR_LOW_MSB = HAS_ADDR_HIGH ? 31 : DMA_AXI_ADDR_WIDTH-1;
 
-  localparam MAX_NUM_FRAMES = 2**MAX_NUM_FRAMES_WIDTH;
+  // INTERFACE_DESCRIPTION_1 (0x010)
+  //   [31:27] MAX_NUM_FRAMES-1 : kept at 7 (framelock not built)
+  //   [26:24] 2D_TLAST / EXT_SYNC / AUTORUN : 0
+  //   [19:16] BYTES_PER_BURST_WIDTH
+  //   [13:12] / [5:4] DMA_TYPE_SRC / DMA_TYPE_DEST : 0 = AXI-MM
+  //   [11:8]  / [3:0] log2(bytes per beat) SRC / DEST
+  localparam [31:0] INTERFACE_DESCRIPTION_1 = {5'd7, 3'b000,
+                                               4'b0, BYTES_PER_BURST_WIDTH[3:0],
+                                               2'b0, 2'b00, BYTES_PER_BEAT_WIDTH[3:0],
+                                               2'b0, 2'b00, BYTES_PER_BEAT_WIDTH[3:0]};
+
+  // INTERFACE_DESCRIPTION_2 (0x014): AxPROT, AxCACHE, CACHE_COHERENT = 0
+  localparam [31:0] INTERFACE_DESCRIPTION_2 = {20'b0, 1'b0, AXI_AXPROT, AXI_AXCACHE, 4'b0};
 
   // Register interface signals
   reg [31:0] up_rdata = 32'h00;
@@ -205,10 +179,9 @@ module axi_dmac_regmap #(
 
   always @(posedge s_axi_aclk) begin
     if (s_axi_aresetn == 1'b0) begin
-      ctrl_enable <= AUTORUN == 1;
+      ctrl_enable <= 1'b0;
       ctrl_pause <= 1'b0;
-      ctrl_flock <= AUTORUN_CONTROL_FLOCK;
-      ctrl_hwdesc <= AUTORUN_CONTROL_HWDESC;
+      ctrl_hwdesc <= 1'b0;
       up_irq_mask <= 2'b11;
       up_scratch <= 32'h00;
       up_wack <= 1'b0;
@@ -224,8 +197,8 @@ module axi_dmac_regmap #(
           up_irq_mask <= up_wdata[1:0];
           end
         9'h100: begin
-          ctrl_flock <= up_wdata[3] & FRAMELOCK;
-          ctrl_hwdesc <= up_wdata[2] & DMA_SG_TRANSFER;
+          // CONTROL[3] FRAMELOCK is not built and always reads 0
+          ctrl_hwdesc <= up_wdata[2];
           ctrl_pause <= up_wdata[1];
           ctrl_enable <= up_wdata[0];
           end
@@ -249,58 +222,29 @@ module axi_dmac_regmap #(
       9'h001: up_rdata <= ID;
       9'h002: up_rdata <= up_scratch;
       9'h003: up_rdata <= 32'h444d4143; // "DMAC"
-      9'h004: up_rdata <= {MAX_NUM_FRAMES[4:0]-1, DMA_2D_TLAST_MODE[0], USE_EXT_SYNC[0], AUTORUN[0],
-                           4'b0,BYTES_PER_BURST_WIDTH[3:0],
-                           2'b0,DMA_TYPE_SRC[1:0],BYTES_PER_BEAT_WIDTH_SRC[3:0],
-                           2'b0,DMA_TYPE_DEST[1:0],BYTES_PER_BEAT_WIDTH_DEST[3:0]};
-      9'h005: up_rdata <= {20'b0,
-                           1'b0,AXI_AXPROT,
-                           AXI_AXCACHE,
-                           3'b0,CACHE_COHERENT};
+      9'h004: up_rdata <= INTERFACE_DESCRIPTION_1;
+      9'h005: up_rdata <= INTERFACE_DESCRIPTION_2;
       9'h020: up_rdata <= up_irq_mask;
       9'h021: up_rdata <= up_irq_pending;
       9'h022: up_rdata <= up_irq_source;
-      9'h100: up_rdata <= {28'b0, ctrl_flock, ctrl_hwdesc, ctrl_pause, ctrl_enable};
-      9'h10d: up_rdata <= DISABLE_DEBUG_REGISTERS ? 32'h00 : dbg_dest_addr[ADDR_LOW_MSB:0];
-      9'h10e: up_rdata <= DISABLE_DEBUG_REGISTERS ? 32'h00 : dbg_src_addr[ADDR_LOW_MSB:0];
-      9'h10f: up_rdata <= DISABLE_DEBUG_REGISTERS ? 32'h00 : dbg_status;
-      9'h110: up_rdata <= DISABLE_DEBUG_REGISTERS ? 32'h00 : dbg_ids0;
-      9'h111: up_rdata <= DISABLE_DEBUG_REGISTERS ? 32'h00 : dbg_ids1;
-      9'h126: up_rdata <= (HAS_ADDR_HIGH && !DISABLE_DEBUG_REGISTERS) ? dbg_dest_addr[DMA_AXI_ADDR_WIDTH-1:HAS_ADDR_HIGH*32] : 32'h00;
-      9'h127: up_rdata <= (HAS_ADDR_HIGH && !DISABLE_DEBUG_REGISTERS) ? dbg_src_addr[DMA_AXI_ADDR_WIDTH-1:HAS_ADDR_HIGH*32] : 32'h00;
+      9'h100: up_rdata <= {28'b0, 1'b0, ctrl_hwdesc, ctrl_pause, ctrl_enable};
+      9'h10d: up_rdata <= dbg_dest_addr[ADDR_LOW_MSB:0];
+      9'h10e: up_rdata <= dbg_src_addr[ADDR_LOW_MSB:0];
+      9'h10f: up_rdata <= dbg_status;
+      9'h110: up_rdata <= dbg_ids0;
+      9'h111: up_rdata <= dbg_ids1;
+      9'h126: up_rdata <= HAS_ADDR_HIGH ? dbg_dest_addr[DMA_AXI_ADDR_WIDTH-1:HAS_ADDR_HIGH*32] : 32'h00;
+      9'h127: up_rdata <= HAS_ADDR_HIGH ? dbg_src_addr[DMA_AXI_ADDR_WIDTH-1:HAS_ADDR_HIGH*32] : 32'h00;
       default: up_rdata <= up_rdata_request;
       endcase
     end
   end
 
   axi_dmac_regmap_request #(
-    .DISABLE_DEBUG_REGISTERS(DISABLE_DEBUG_REGISTERS),
-    .BYTES_PER_BEAT_WIDTH_DEST(BYTES_PER_BEAT_WIDTH_DEST),
-    .BYTES_PER_BEAT_WIDTH_SRC(BYTES_PER_BEAT_WIDTH_SRC),
-    .BYTES_PER_BEAT_WIDTH_SG(BYTES_PER_BEAT_WIDTH_SG),
+    .BYTES_PER_BEAT_WIDTH(BYTES_PER_BEAT_WIDTH),
     .BYTES_PER_BURST_WIDTH(BYTES_PER_BURST_WIDTH),
     .DMA_AXI_ADDR_WIDTH(DMA_AXI_ADDR_WIDTH),
-    .DMA_LENGTH_WIDTH(DMA_LENGTH_WIDTH),
-    .DMA_LENGTH_ALIGN(DMA_LENGTH_ALIGN),
-    .DMA_CYCLIC(DMA_CYCLIC),
-    .HAS_DEST_ADDR(HAS_DEST_ADDR),
-    .HAS_SRC_ADDR(HAS_SRC_ADDR),
-    .DMA_2D_TRANSFER(DMA_2D_TRANSFER),
-    .DMA_SG_TRANSFER(DMA_SG_TRANSFER),
-    .SYNC_TRANSFER_START(SYNC_TRANSFER_START),
-    .FRAMELOCK(FRAMELOCK),
-    .MAX_NUM_FRAMES_WIDTH(MAX_NUM_FRAMES_WIDTH),
-    .AUTORUN(AUTORUN),
-    .AUTORUN_FLAGS(AUTORUN_FLAGS),
-    .AUTORUN_SRC_ADDR(AUTORUN_SRC_ADDR),
-    .AUTORUN_DEST_ADDR(AUTORUN_DEST_ADDR),
-    .AUTORUN_X_LENGTH(AUTORUN_X_LENGTH),
-    .AUTORUN_Y_LENGTH(AUTORUN_Y_LENGTH),
-    .AUTORUN_SRC_STRIDE(AUTORUN_SRC_STRIDE),
-    .AUTORUN_DEST_STRIDE(AUTORUN_DEST_STRIDE),
-    .AUTORUN_SG_ADDRESS(AUTORUN_SG_ADDRESS),
-    .AUTORUN_FRAMELOCK_CONFIG(AUTORUN_FRAMELOCK_CONFIG),
-    .AUTORUN_FRAMELOCK_STRIDE(AUTORUN_FRAMELOCK_STRIDE)
+    .DMA_LENGTH_WIDTH(DMA_LENGTH_WIDTH)
   ) i_regmap_request (
     .clk(s_axi_aclk),
     .reset(~s_axi_aresetn),
@@ -309,14 +253,12 @@ module axi_dmac_regmap #(
     .up_eot(up_eot),
 
     .up_wreq(up_wreq),
-    .up_rreq(up_rreq),
     .up_waddr(up_waddr),
     .up_wdata(up_wdata),
     .up_raddr(up_raddr),
     .up_rdata(up_rdata_request),
 
     .ctrl_enable(ctrl_enable),
-    .ctrl_hwdesc(ctrl_hwdesc),
 
     .request_valid(request_valid),
     .request_ready(request_ready),
@@ -324,22 +266,10 @@ module axi_dmac_regmap #(
     .request_src_address(request_src_address),
     .request_sg_address(request_sg_address),
     .request_x_length(request_x_length),
-    .request_y_length(request_y_length),
-    .request_dest_stride(request_dest_stride),
-    .request_src_stride(request_src_stride),
-    .request_flock_framenum(request_flock_framenum),
-    .request_flock_mode(request_flock_mode),
-    .request_flock_wait_writer(request_flock_wait_writer),
-    .request_flock_distance(request_flock_distance),
-    .request_flock_stride(request_flock_stride),
-    .request_sync_transfer_start(request_sync_transfer_start),
-    .request_last(request_last),
-    .request_cyclic(request_cyclic),
 
     .response_eot(response_eot),
     .response_sg_desc_id(response_sg_desc_id),
     .response_measured_burst_length(response_measured_burst_length),
-    .response_partial(response_partial),
     .response_valid(response_valid),
     .response_ready(response_ready));
 
