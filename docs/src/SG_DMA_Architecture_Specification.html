@@ -52,10 +52,12 @@
   .cover .t2 { font-size: 13pt; color: var(--muted); margin-top: 4px; }
   .cover table { width: 60%; margin-top: 30mm; font-size: 9.2pt; }
   .cover table th { width: 32%; }
-  .toc { columns: 2; column-gap: 24px; font-size: 9pt; }
-  .toc div { break-inside: avoid; }
-  .toc .l1 { font-weight: 700; margin-top: 4px; }
-  .toc .l2 { padding-left: 14px; color: #374151; }
+  .tochead { break-before: page; font-size: 16pt; border-bottom: 2px solid #1f2937; padding-bottom: 4px; margin-bottom: 10px; }
+  .toc { font-size: 10pt; line-height: 1.75; }
+  .toc a { display: block; color: #111827; text-decoration: none; break-inside: avoid; }
+  .toc .t1 { font-weight: 700; margin-top: 7px; }
+  .toc .t2 { padding-left: 22px; }
+  .toc .t3 { padding-left: 44px; color: #374151; font-size: 9.5pt; }
   /* svg text */
   svg text { font-family: "Malgun Gothic", sans-serif; fill: #1f2a37; }
   svg .m { font-family: Consolas, monospace; }
@@ -129,32 +131,111 @@
   <tr><td>0x450 PARTIAL_TRANSFER_ID</td><td>읽으면 내부 FIFO가 하나 빠짐</td><td>FIFO가 없어져 항상 0이 읽힘 (부작용 없음)</td></tr>
 </table>
 
-<h2>목차</h2>
+<h2 class="tochead">목차 (Table of Contents)</h2>
 <div class="toc">
-  <div class="l1">1 Introduction</div><div class="l2">1.1 Purpose · 1.2 Scope · 1.3 Terms · 1.4 Reference · 1.5 읽는 순서</div>
-  <div class="l1">2 SG DMA Basics</div><div class="l2">2.1 Simple DMA · 2.2 Why Scatter-Gather · 2.3 Descriptor Chain Example</div>
-  <div class="l1">3 System Architecture</div><div class="l2">3.1 Top Block Diagram · 3.2 Internal Operation Overview · 3.3 Functional Blocks · 3.4 Parameters · 3.5 Interfaces</div>
-  <div class="l1">4 RTL File Organization</div><div class="l2">4.1 Directory · 4.2 Hierarchy · 4.3 File List · 4.4 ADI 원본과의 차이 · 4.5 Register Decode</div>
-  <div class="l1">5 Module Descriptions</div><div class="l2">5.1 ~ 5.12 모듈별 설명 · 5.13 Supporting Modules</div>
-  <div class="l1">6 Descriptor Format</div><div class="l2">6.1 Layout · 6.2 Fields · 6.3 Example · 6.4 Rules</div>
-  <div class="l1">7 SG Engine (dmac_sg)</div><div class="l2">7.1 Block Diagram · 7.2 Blocks · 7.3 FSM · 7.4 States · 7.5 Rules · 7.6 Prefetch</div>
-  <div class="l1">8 Data Path and Burst Handling</div><div class="l2">8.1 Diagram · 8.2 Burst Splitting · 8.3 Buffer · 8.4 Flow Control · 8.5 EOT · 8.6 AXI Summary</div>
-  <div class="l1">9 Register Interface</div><div class="l2">9.1 Conventions · 9.2 Map · 9.3 CONTROL · 9.4 IRQ · 9.5 DBG_STATUS · 9.6 DBG_IDS</div>
-  <div class="l1">10 Operation Flow</div><div class="l2">10.1 Programming · 10.2 Flow Chart · 10.3 Step-by-Step (SAN-005) · 10.4 Timing</div>
-  <div class="l1">11 Interrupt and Status</div><div class="l2">11.1 Path · 11.2 Events · 11.3 Transfer vs Descriptor · 11.4 Rules</div>
-  <div class="l1">12 ENABLE / PAUSE Control</div><div class="l2">12.1 Reset Manager FSM · 12.2 ENABLE=0 · 12.3 PAUSE</div>
-  <div class="l1">13 Debug Signal Guide</div><div class="l2">13.1 ~ 13.4 신호 그룹 · 13.5 Stuck Points</div>
-  <div class="l1">14 CPU-Side Tracing</div><div class="l2">14.1 Readable · 14.2 Methods · 14.3 Not Visible</div>
-  <div class="l1">15 Error Model and Debug Checklist</div><div class="l2">15.1 Conditions · 15.2 Recovery · 15.3 Checklist</div>
-  <div class="l1">Appendix</div><div class="l2">A. Verification Team Q&amp;A · A.1 Open Items</div>
+  <a class="t1" href="#sec1">1 Introduction</a>
+  <a class="t2" href="#sec2">1.1 Purpose</a>
+  <a class="t2" href="#sec3">1.2 Scope</a>
+  <a class="t2" href="#sec4">1.3 Terms</a>
+  <a class="t2" href="#sec5">1.4 Reference</a>
+  <a class="t2" href="#sec6">1.5 읽는 순서</a>
+  <a class="t1" href="#sec7">2 SG DMA Basics</a>
+  <a class="t2" href="#sec8">2.1 Simple DMA</a>
+  <a class="t2" href="#sec9">2.2 Why Scatter-Gather</a>
+  <a class="t2" href="#sec10">2.3 Descriptor Chain Example</a>
+  <a class="t1" href="#sec11">3 System Architecture</a>
+  <a class="t2" href="#sec12">3.1 Top Block Diagram</a>
+  <a class="t2" href="#sec13">3.2 Internal Operation Overview</a>
+  <a class="t2" href="#sec14">3.3 Functional Block Organization</a>
+  <a class="t2" href="#sec15">3.4 System Parameters</a>
+  <a class="t2" href="#sec16">3.5 Interfaces</a>
+  <a class="t3" href="#sec17">3.5.1 Clock, Reset, Interrupt</a>
+  <a class="t3" href="#sec18">3.5.2 AXI4-Lite Slave (s_axi_*)</a>
+  <a class="t3" href="#sec19">3.5.3 AXI4 Masters</a>
+  <a class="t1" href="#sec20">4 RTL File Organization</a>
+  <a class="t2" href="#sec21">4.1 Directory Structure</a>
+  <a class="t2" href="#sec22">4.2 Module Hierarchy</a>
+  <a class="t2" href="#sec23">4.3 File List</a>
+  <a class="t2" href="#sec24">4.4 ADI 원본과의 차이</a>
+  <a class="t2" href="#sec25">4.5 Register Decode Location</a>
+  <a class="t1" href="#sec26">5 Module Descriptions</a>
+  <a class="t2" href="#sec27">5.1 sg_dma_top</a>
+  <a class="t2" href="#sec28">5.2 axi_dmac_regmap / up_axi</a>
+  <a class="t2" href="#sec29">5.3 axi_dmac_regmap_request</a>
+  <a class="t2" href="#sec30">5.4 axi_dmac_transfer (Request MUX)</a>
+  <a class="t2" href="#sec31">5.5 axi_dmac_reset_manager</a>
+  <a class="t2" href="#sec32">5.6 dmac_sg (SG Engine)</a>
+  <a class="t2" href="#sec33">5.7 request_arb (Data Mover)</a>
+  <a class="t2" href="#sec34">5.8 request_generator</a>
+  <a class="t2" href="#sec35">5.9 src_axi_mm</a>
+  <a class="t2" href="#sec36">5.10 axi_dmac_burst_memory</a>
+  <a class="t2" href="#sec37">5.11 dest_axi_mm</a>
+  <a class="t2" href="#sec38">5.12 axi_dmac_response_manager</a>
+  <a class="t2" href="#sec39">5.13 Supporting Modules</a>
+  <a class="t1" href="#sec40">6 Descriptor Format</a>
+  <a class="t2" href="#sec41">6.1 Layout</a>
+  <a class="t2" href="#sec42">6.2 Field Description</a>
+  <a class="t2" href="#sec43">6.3 Example (SAN-005 D0)</a>
+  <a class="t2" href="#sec44">6.4 Rules and Cautions</a>
+  <a class="t1" href="#sec45">7 SG Engine (dmac_sg) Architecture and FSM</a>
+  <a class="t2" href="#sec46">7.1 Internal Block Diagram</a>
+  <a class="t2" href="#sec47">7.2 Internal Blocks</a>
+  <a class="t2" href="#sec48">7.3 State Diagram</a>
+  <a class="t2" href="#sec49">7.4 State Description</a>
+  <a class="t2" href="#sec50">7.5 Transition Rules</a>
+  <a class="t2" href="#sec51">7.6 Prefetch</a>
+  <a class="t1" href="#sec52">8 Data Path and Burst Handling</a>
+  <a class="t2" href="#sec53">8.1 Data Path Diagram</a>
+  <a class="t2" href="#sec54">8.2 Burst Splitting</a>
+  <a class="t2" href="#sec55">8.3 Store-and-Forward Buffer</a>
+  <a class="t2" href="#sec56">8.4 Flow Control</a>
+  <a class="t2" href="#sec57">8.5 End-of-Transfer Generation</a>
+  <a class="t2" href="#sec58">8.6 AXI Behavior Summary</a>
+  <a class="t1" href="#sec59">9 Register Interface</a>
+  <a class="t2" href="#sec60">9.1 Access Conventions</a>
+  <a class="t2" href="#sec61">9.2 Register Map</a>
+  <a class="t2" href="#sec62">9.3 CONTROL (0x400)</a>
+  <a class="t2" href="#sec63">9.4 IRQ_MASK / IRQ_PENDING / IRQ_SOURCE (0x080 / 0x084 / 0x088)</a>
+  <a class="t2" href="#sec64">9.5 DBG_STATUS (0x43C)</a>
+  <a class="t2" href="#sec65">9.6 DBG_IDS0 / DBG_IDS1 (0x440 / 0x444)</a>
+  <a class="t1" href="#sec66">10 Operation Flow</a>
+  <a class="t2" href="#sec67">10.1 Programming Sequence</a>
+  <a class="t2" href="#sec68">10.2 Transfer Flow Chart</a>
+  <a class="t2" href="#sec69">10.3 Step-by-Step with RTL (SAN-005)</a>
+  <a class="t2" href="#sec70">10.4 Timing Overview</a>
+  <a class="t1" href="#sec71">11 Interrupt and Status</a>
+  <a class="t2" href="#sec72">11.1 Interrupt Path</a>
+  <a class="t2" href="#sec73">11.2 Event Summary</a>
+  <a class="t2" href="#sec74">11.3 Transfer vs Descriptor</a>
+  <a class="t2" href="#sec75">11.4 Interrupt Handling Rules</a>
+  <a class="t1" href="#sec76">12 ENABLE / PAUSE Control</a>
+  <a class="t2" href="#sec77">12.1 Reset Manager FSM</a>
+  <a class="t2" href="#sec78">12.2 ENABLE = 0</a>
+  <a class="t2" href="#sec79">12.3 PAUSE = 1</a>
+  <a class="t1" href="#sec80">13 Debug Signal Guide</a>
+  <a class="t2" href="#sec81">13.1 Group A — External Interfaces</a>
+  <a class="t2" href="#sec82">13.2 Group B — Control and Status</a>
+  <a class="t2" href="#sec83">13.3 Group C — SG Engine</a>
+  <a class="t2" href="#sec84">13.4 Group D — Request MUX and Data Engine</a>
+  <a class="t2" href="#sec85">13.5 Reading Stuck Points</a>
+  <a class="t1" href="#sec86">14 CPU-Side Tracing</a>
+  <a class="t2" href="#sec87">14.1 What Software Can Read</a>
+  <a class="t2" href="#sec88">14.2 Recommended Tracing Methods</a>
+  <a class="t2" href="#sec89">14.3 What Software Cannot See</a>
+  <a class="t1" href="#sec90">15 Error Model and Debug Checklist</a>
+  <a class="t2" href="#sec91">15.1 Error Conditions and Hardware Behavior</a>
+  <a class="t2" href="#sec92">15.2 Recovery</a>
+  <a class="t2" href="#sec93">15.3 Debug Checklist</a>
+  <a class="t1" href="#sec94">Appendix A. Verification Team Q&amp;A</a>
+  <a class="t2" href="#sec95">A.1 Open Items for Verification</a>
 </div>
 
 <!-- ===================================================================== -->
-<h1>1 Introduction</h1>
+<h1 id="sec1">1 Introduction</h1>
 <p>이 문서는 SG(Scatter-Gather) DMA IP인 <code>sg_dma_top</code>의 구조와 동작을 설명합니다. 이 IP는 ADI <code>axi_dmac</code>(hdl_2026_r1)에서 SG 메모리→메모리 복사에 필요한 부분만 남겨 정리한 것입니다.</p>
 <p>목표는 SG DMA를 처음 보는 사람이 <b>이 문서만 읽고 RTL을 열어 따라갈 수 있고, 시뮬레이션 파형에서 문제의 원인을 찾을 수 있게</b> 하는 것입니다.</p>
 
-<h2>1.1 Purpose</h2>
+<h2 id="sec2">1.1 Purpose</h2>
 <ul>
   <li>SG DMA가 무엇이고, 일반 DMA에 무엇이 더해졌는지 설명합니다.</li>
   <li>RTL 파일 구성, 모듈 계층, 모듈마다 하는 일을 정리합니다.</li>
@@ -162,7 +243,7 @@
   <li>검증·디버깅에 필요한 신호, CPU가 읽을 수 있는 상태 정보, 문제가 생겼을 때 볼 곳을 알려 줍니다.</li>
 </ul>
 
-<h2>1.2 Scope</h2>
+<h2 id="sec3">1.2 Scope</h2>
 <table>
   <tr><th style="width:18%">구분</th><th>내용</th></tr>
   <tr><td>대상 DUT</td><td><code>rtl/sg_dma_top.v</code></td></tr>
@@ -172,7 +253,7 @@
   <tr><td>기준 TB</td><td><code>tb/tb_sg_dma.sv</code> (Sanity SAN-001 ~ SAN-007, 46 checks)</td></tr>
 </table>
 
-<h2>1.3 Terms</h2>
+<h2 id="sec4">1.3 Terms</h2>
 <table>
   <tr><th style="width:18%">용어</th><th>뜻</th></tr>
   <tr><td>DMA</td><td>Direct Memory Access. CPU 대신 메모리 복사를 해 주는 하드웨어</td></tr>
@@ -190,7 +271,7 @@
   <tr><td>Gray 코드</td><td>이웃한 값끼리 1비트만 다른 숫자 표기. 내부 burst 번호에 쓰임</td></tr>
 </table>
 
-<h2>1.4 Reference</h2>
+<h2 id="sec5">1.4 Reference</h2>
 <ul>
   <li>AXI DMA Technical Specification (기본 DMA 스펙, 2026-02-07) — 이 문서의 구성과 형식을 따름</li>
   <li>SGDMA-SFR-rel-v2.0.0 (레지스터 상세) · SGDMA-SOR-rel-v2.0.0 (검증 요구사항, T-01 ~ T-15) · SGDMA-SANITY-rel-v2.0.0 (Sanity Test)</li>
@@ -198,7 +279,7 @@
 </ul>
 <p class="small">SFR / SOR / SANITY 문서는 정리 전 RTL을 기준으로 쓰였습니다. 레지스터 값과 동작은 그대로지만, 파일 경로·행 번호·0x450 설명은 이 문서가 최신입니다.</p>
 
-<h2>1.5 읽는 순서</h2>
+<h2 id="sec6">1.5 읽는 순서</h2>
 <table>
   <tr><th style="width:34%">이런 분이라면</th><th>이 순서로 읽으세요</th></tr>
   <tr><td>SG DMA가 처음</td><td>2장 → 3.1 → <b>3.2 (Figure 3)</b> → 10장</td></tr>
@@ -208,13 +289,13 @@
 </table>
 
 <!-- ===================================================================== -->
-<h1>2 SG DMA Basics</h1>
+<h1 id="sec7">2 SG DMA Basics</h1>
 <p>SG DMA는 일반 DMA 앞에 <b>"descriptor를 메모리에서 읽어 전송 요청으로 바꿔 주는 블록"</b>을 하나 더 붙인 것입니다. 데이터를 실제로 옮기는 엔진은 일반 DMA와 같습니다.</p>
 
-<h2>2.1 Simple DMA</h2>
+<h2 id="sec8">2.1 Simple DMA</h2>
 <p>일반(simple) DMA는 CPU가 레지스터에 <code>SRC 주소</code>, <code>DST 주소</code>, <code>길이</code>를 쓰고 START하면, DMA가 직접 읽고 쓴 뒤 인터럽트로 끝났음을 알립니다. 한 번 설정하면 <b>이어진 메모리 한 덩어리</b>만 옮길 수 있습니다. 이 IP도 <code>CONTROL.HWDESC = 0</code>이면 이렇게 동작합니다(레지스터 모드).</p>
 
-<h2>2.2 Why Scatter-Gather</h2>
+<h2 id="sec9">2.2 Why Scatter-Gather</h2>
 <p>실제 버퍼는 메모리 여러 곳에 흩어져 있는 경우가 많습니다. 예를 들어 OS가 잡아 준 버퍼는 4KB 페이지 단위로 물리 주소가 흩어져 있습니다. Simple DMA로 조각 N개를 옮기려면 CPU가 N번 설정하고 N번 인터럽트를 처리해야 합니다.</p>
 <p>SG DMA에서는 CPU가 할 일 목록(descriptor)을 메모리에 미리 써 두고, <b>첫 descriptor 주소 하나만</b> DMA에 알려 줍니다. DMA는 descriptor를 한 장씩 읽어 처리하고, <code>next</code> 주소를 따라 다음 장으로 넘어가며, <code>LAST</code> 표시가 있는 장에서 멈춥니다.</p>
 <table>
@@ -226,7 +307,7 @@
   <tr><td>추가 블록</td><td>없음</td><td><code>dmac_sg</code> (descriptor를 읽는 FSM)</td></tr>
 </table>
 
-<h2>2.3 Descriptor Chain Example</h2>
+<h2 id="sec10">2.3 Descriptor Chain Example</h2>
 <p>이 문서 전체에서 TB의 <b>SAN-005</b>(descriptor 3장 gather)를 예제로 씁니다. CPU는 <code>SG_ADDRESS</code>에 D0 주소만 씁니다. DMA는 D0 → D1 → D2를 <code>next</code>로 따라가며 흩어진 A, B, C를 <code>0x21000</code>부터 이어 붙이고, LAST가 있는 D2에서 멈춥니다.</p>
 
 <figure>
@@ -279,7 +360,7 @@
 </figure>
 
 <!-- ===================================================================== -->
-<h1>3 System Architecture</h1>
+<h1 id="sec11">3 System Architecture</h1>
 <p><code>sg_dma_top</code>은 AXI4-Lite slave 1개, AXI4 master 3개(SRC 읽기, DEST 쓰기, SG 읽기), 인터럽트 출력 1개를 가집니다. 안쪽은 크게 세 부분입니다.</p>
 <table>
   <tr><th style="width:22%">부분</th><th style="width:30%">모듈</th><th>하는 일</th></tr>
@@ -288,7 +369,7 @@
   <tr><td><span class="tag dp">Data engine</span></td><td><code>request_arb</code>와 그 아래 모듈</td><td>요청 하나를 burst로 나눠 실제로 읽고 씀</td></tr>
 </table>
 
-<h2>3.1 Top Block Diagram</h2>
+<h2 id="sec12">3.1 Top Block Diagram</h2>
 <figure>
 <div class="ftitle">descriptor는 m_sg_axi로 들어와 레지스터 요청과 같은 데이터 엔진을 움직인다</div>
 <svg viewBox="0 0 680 380">
@@ -352,7 +433,7 @@
 </figure>
 <p>위쪽 줄이 레지스터를 맡는 Control plane이고, 점선 상자가 <code>i_transfer</code>입니다. <code>HWDESC = 1</code>이면 <code>dmac_sg</code>가 descriptor를 읽어 MUX에 넣고, <code>request_arb</code>는 이를 레지스터 요청과 똑같이 처리합니다. descriptor 하나가 끝날 때마다 <code>dma_eot</code>가 <code>dmac_sg</code>로 돌아갑니다.</p>
 
-<h2>3.2 Internal Operation Overview</h2>
+<h2 id="sec13">3.2 Internal Operation Overview</h2>
 <p>Figure 2는 블록이 무엇인지 보여 주고, 다음 쪽의 <b>Figure 3은 그 블록들 안에서 일이 어떤 순서로 흘러가는지</b> 보여 줍니다. 원 안의 번호 ①~⑪을 따라가면 CPU가 설정한 뒤부터 인터럽트가 올라갈 때까지의 전체 흐름을 코드를 보지 않고도 따라갈 수 있습니다. 번호마다의 설명은 그림 다음 쪽의 표에 있습니다.</p>
 <p>그림을 읽는 규칙은 아래와 같습니다.</p>
 <ul>
@@ -533,7 +614,7 @@
 </table>
 <div class="info"><p><b>두 줄이 동시에 돈다.</b> ②~③(descriptor 읽기)과 ⑤~⑨(데이터 이동)는 서로 기다리지 않고 동시에 진행됩니다. SAN-005에서는 descriptor 3장을 다 읽은 뒤에야 첫 DEST 쓰기가 나갑니다(10.4절 실측).</p></div>
 
-<h2>3.3 Functional Block Organization</h2>
+<h2 id="sec14">3.3 Functional Block Organization</h2>
 <table>
   <tr><th style="width:18%">블록</th><th style="width:30%">RTL 모듈 (인스턴스)</th><th>역할</th></tr>
   <tr><td>AXI4-Lite Slave I/F</td><td><code>up_axi</code> (<code>i_regmap.i_up_axi</code>)</td><td>AXI4-Lite 핸드셰이크를 처리하고 바이트 주소를 워드 주소(<code>up_waddr</code>)로 바꿈</td></tr>
@@ -550,7 +631,7 @@
   <tr><td>Completion</td><td><code>axi_dmac_response_manager</code> (<code>…i_response_manager</code>)</td><td>DEST 쓰기 응답(B)을 모아 요청 완료(<code>eot</code>)를 만듦</td></tr>
 </table>
 
-<h2>3.4 System Parameters</h2>
+<h2 id="sec15">3.4 System Parameters</h2>
 <p><code>sg_dma_top</code>의 파라미터는 아래 9개뿐입니다. 정리 전에는 <code>axi_dmac</code>에 38개를 넘겼지만, 기능을 끄는 파라미터는 코드와 함께 삭제했습니다.</p>
 <table>
   <tr><th style="width:26%">Parameter</th><th style="width:12%">기본값</th><th>의미 / 영향</th></tr>
@@ -574,8 +655,8 @@
 </table>
 <div class="note"><p><b>검증된 구성은 기본값뿐입니다.</b> Sanity와 정리 전/후 비교는 기본값으로 했고, 비교는 DATA_WIDTH 32·128, 버퍼 크기 2·4·16, ADDR_WIDTH 40에서도 했습니다. 다만 <b>DATA_WIDTH = 32</b>에서는 체인 전송 중 AWLEN과 WLAST 위치가 어긋나는 AXI 규칙 위반이 정리 전 ADI 코드에서도 똑같이 관찰되었습니다. 기본값이 아닌 구성을 쓰려면 먼저 따로 검증해야 합니다(부록 A.1).</p></div>
 
-<h2>3.5 Interfaces</h2>
-<h3>3.5.1 Clock, Reset, Interrupt</h3>
+<h2 id="sec16">3.5 Interfaces</h2>
+<h3 id="sec17">3.5.1 Clock, Reset, Interrupt</h3>
 <table>
   <tr><th style="width:16%">Signal</th><th style="width:8%">Dir</th><th style="width:8%">Bits</th><th>설명</th></tr>
   <tr><td><code>clk</code></td><td>In</td><td>1</td><td>모든 포트와 내부 블록의 공통 클럭</td></tr>
@@ -583,14 +664,14 @@
   <tr><td><code>irq</code></td><td>Out</td><td>1</td><td>인터럽트. <code>IRQ_PENDING</code>이 0이 아니면 1 (level, 1클럭 늦게 반영)</td></tr>
 </table>
 
-<h3>3.5.2 AXI4-Lite Slave (<code>s_axi_*</code>)</h3>
+<h3 id="sec18">3.5.2 AXI4-Lite Slave (<code>s_axi_*</code>)</h3>
 <p>레지스터 접근용입니다. 주소 11bit(0x000 ~ 0x7FF), 데이터 32bit. AW / W / B / AR / R 다섯 채널을 모두 씁니다. burst는 지원하지 않습니다.</p>
 <ul>
   <li><code>s_axi_wstrb</code>와 <code>s_axi_awprot</code> / <code>arprot</code>는 연결만 되어 있고 쓰이지 않습니다. 모든 쓰기는 32bit 전체 쓰기입니다.</li>
   <li><code>bresp</code> / <code>rresp</code>는 항상 OKAY입니다. 없는 주소를 읽으면 0이 나오고, 없는 주소에 쓰면 무시됩니다.</li>
 </ul>
 
-<h3>3.5.3 AXI4 Masters</h3>
+<h3 id="sec19">3.5.3 AXI4 Masters</h3>
 <table>
   <tr><th style="width:15%">Port</th><th style="width:11%">채널</th><th style="width:8%">폭</th><th style="width:15%">용도</th><th>고정 값 / 참고</th></tr>
   <tr><td><code>m_src_axi_*</code></td><td>AR, R</td><td>64</td><td>원본 데이터 읽기</td><td><code>ARBURST</code>=INCR, <code>ARSIZE</code>=3, <code>ARID</code>=0, <code>ARLOCK</code>=0. <code>RRESP</code>·<code>RID</code>는 쓰이지 않음</td></tr>
@@ -600,10 +681,10 @@
 <p>각 master에서 쓰지 않는 방향(SRC의 쓰기, DEST의 읽기, SG의 쓰기)은 포트 자체가 없습니다. 세 master 모두 <code>AxCACHE = 4'b0000</code>, <code>AxPROT = 3'b000</code>입니다.</p>
 
 <!-- ===================================================================== -->
-<h1>4 RTL File Organization</h1>
+<h1 id="sec20">4 RTL File Organization</h1>
 <p>RTL은 <code>rtl/</code> 한 폴더에 18개 파일로 되어 있습니다. top인 <code>sg_dma_top.v</code>를 빼면 모두 ADI <code>axi_dmac</code>에서 가져와 SG 메모리→메모리 구성에 필요한 부분만 남긴 파일입니다. ADI 파일은 원래 라이선스 헤더를 그대로 유지합니다.</p>
 
-<h2>4.1 Directory Structure</h2>
+<h2 id="sec21">4.1 Directory Structure</h2>
 <pre>.
 ├── rtl/                      ← RTL 18개 (하위 폴더 없음)
 │   ├── sg_dma_top.v          ← DUT top
@@ -620,7 +701,7 @@
 ├── xsim/                     ← Makefile (make clean; make sim), xsim_run.tcl
 └── docs/                     ← SFR, SOR, SANITY, 이 문서</pre>
 
-<h2>4.2 Module Hierarchy</h2>
+<h2 id="sec22">4.2 Module Hierarchy</h2>
 <p>시뮬레이션 계층 경로 기준입니다. 파형에서 신호를 찾을 때 이 경로를 그대로 씁니다. 상자는 <code>인스턴스 : 모듈</code> 입니다.</p>
 <figure>
 <div class="ftitle">SG 기능은 i_dmac_sg 하나, 나머지는 일반 DMA 엔진</div>
@@ -658,7 +739,7 @@
 <figcaption>Figure 4. Instance hierarchy (instance : module). <code>request_arb</code> 안에는 이 밖에 요청·burst 길이를 넘기는 1단 FIFO 3개(<code>i_src_req_fifo</code>, <code>i_dest_req_fifo</code>, <code>i_src_dest_bl_fifo</code>)가 있습니다.</figcaption>
 </figure>
 
-<h2>4.3 File List</h2>
+<h2 id="sec23">4.3 File List</h2>
 <p><code>filelists/rtl.f</code>의 순서대로입니다. 줄 수는 ADI 라이선스 헤더(약 40줄)를 포함합니다.</p>
 <table>
   <tr><th style="width:32%">파일</th><th class="c" style="width:7%">줄</th><th style="width:12%">분류</th><th>역할</th></tr>
@@ -682,7 +763,7 @@
   <tr><td><code>inc_id.vh</code></td><td class="c">67</td><td>공용</td><td>Gray 코드 함수 <code>inc_id</code>, <code>g2b</code>, <code>b2g</code> (ADI 원본 그대로)</td></tr>
 </table>
 
-<h2>4.4 ADI 원본과의 차이</h2>
+<h2 id="sec24">4.4 ADI 원본과의 차이</h2>
 <p>ADI <code>axi_dmac</code>는 Stream / FIFO / 2D / 비동기 클럭 등 여러 구성을 하나의 코드로 지원합니다. 이 구성에서 쓰이지 않는 코드는 모두 지웠습니다(2026-10-17).</p>
 <table>
   <tr><th style="width:30%">지운 것</th><th>원래 하던 일</th></tr>
@@ -697,7 +778,7 @@
 <p><b>동작이 같다는 근거:</b> 정리 전 RTL과 정리 후 RTL을 같은 입력으로 나란히 돌리고, 모든 출력 포트를 매 클럭 비교했습니다. 레지스터 전체 읽기·쓰기, SG / 레지스터 모드 전송, 1바이트 단위 길이, 체인 1~32장, 중간 EOT, IRQ 마스크 4종, 전송 중 ENABLE=0, PAUSE, 비정렬 주소, 메모리 쪽 무작위 지연, 무작위 시퀀스를 넣었고, 약 9만 클럭 동안 차이가 0이었습니다. Sanity 로그도 정리 전과 같습니다.</p>
 <p><b>그 전부터 있던 수정 1건:</b> <code>axi_dmac_burst_memory.v</code>의 <code>{DMA_LENGTH_ALIGN{1'b1}}</code>(0번 반복은 Verilog 문법 위반) 수정입니다. 이 구성에서는 값이 0이라, 지금 코드는 <code>dest_burst_len_data = 'h0</code>으로 단순해졌습니다.</p>
 
-<h2>4.5 Register Decode Location</h2>
+<h2 id="sec25">4.5 Register Decode Location</h2>
 <p>레지스터는 두 파일에서 처리됩니다. 바이트 주소를 4로 나눈 값을 <code>9'hXXX</code>로 검색하면 됩니다 (예: 0x408 → <code>9'h102</code>).</p>
 <table>
   <tr><th style="width:32%">파일</th><th>담당 레지스터</th></tr>
@@ -706,17 +787,17 @@
 </table>
 
 <!-- ===================================================================== -->
-<h1>5 Module Descriptions</h1>
+<h1 id="sec26">5 Module Descriptions</h1>
 <p>SG 전송 한 번에 관여하는 모듈을 위에서 아래 순서로 설명합니다. 모듈끼리는 모두 <b>valid / ready 핸드셰이크</b>로 요청을 넘깁니다. 계층 경로의 약어는 13장 첫 표를 따릅니다(TOP = <code>tb_sg_dma.dut</code>).</p>
 
-<h2>5.1 sg_dma_top</h2>
+<h2 id="sec27">5.1 sg_dma_top</h2>
 <ul>
   <li><b>파일:</b> <code>rtl/sg_dma_top.v</code> (TOP)</li>
   <li><b>역할:</b> 파라미터에서 내부 값을 계산하고(3.4절), <code>i_regmap</code>과 <code>i_transfer</code> 두 블록을 연결합니다. 정리 전에 <code>axi_dmac.v</code>가 하던 일을 이 파일이 직접 합니다.</li>
   <li><b>그 밖:</b> 디버그 레지스터용 <code>dbg_ids0/1</code>을 만들고, 세 master의 <code>AxID</code>, <code>AxLOCK</code>을 0으로 묶습니다. 로직은 이것뿐입니다.</li>
 </ul>
 
-<h2>5.2 axi_dmac_regmap / up_axi</h2>
+<h2 id="sec28">5.2 axi_dmac_regmap / up_axi</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>axi_dmac_regmap.v</code>, <code>up_axi.v</code> / <code>i_regmap</code>, <code>i_regmap.i_up_axi</code></li>
   <li><b>역할:</b> <code>up_axi</code>가 AXI4-Lite를 받아 <code>up_wreq</code>, <code>up_waddr</code>(워드 주소), <code>up_wdata</code>로 바꿉니다. regmap은 이를 보고 CONTROL과 IRQ 레지스터를 바꿉니다.</li>
@@ -724,7 +805,7 @@
   <li><b>IRQ 로직</b> (158~174행): <code>up_irq_source</code>에 SOT / EOT 이벤트를 모으고, <code>up_irq_pending = ~up_irq_mask &amp; up_irq_source</code>가 0이 아니면 다음 클럭에 <code>irq = 1</code>.</li>
 </ul>
 
-<h2>5.3 axi_dmac_regmap_request</h2>
+<h2 id="sec29">5.3 axi_dmac_regmap_request</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>axi_dmac_regmap_request.v</code> / <code>i_regmap.i_regmap_request</code></li>
   <li><b>역할:</b> 전송 요청 레지스터를 관리합니다. <code>TRANSFER_SUBMIT</code>에 1이 쓰이면 <code>up_dma_req_valid</code>를 1로 올리고(131행), 요청이 받아들여지면(SOT) 내립니다. <code>ENABLE = 0</code>이면 SUBMIT은 무시됩니다.</li>
@@ -733,7 +814,7 @@
   <li><b>SOT / EOT 펄스</b> (186~187행): <code>up_sot = up_dma_req_valid &amp; request_ready</code>, <code>up_eot = response_eot &amp; response_valid &amp; response_ready</code></li>
 </ul>
 
-<h2>5.4 axi_dmac_transfer (Request MUX)</h2>
+<h2 id="sec30">5.4 axi_dmac_transfer (Request MUX)</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>axi_dmac_transfer.v</code> / <code>i_transfer</code></li>
   <li><b>역할:</b> reset manager, <code>dmac_sg</code>, <code>request_arb</code>를 연결합니다. SG 모드와 레지스터 모드를 가르는 MUX가 이 파일에 있습니다.</li>
@@ -750,7 +831,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <li><b>읽는 법:</b> <code>ctrl_hwdesc = 1</code>이면 엔진에 들어가는 주소·길이가 레지스터가 아니라 descriptor에서 옵니다. 완료(<code>req_eot</code>)는 descriptor의 EOT_IRQ 플래그가 1일 때만 레지스터 쪽으로 올라갑니다.</li>
 </ul>
 
-<h2>5.5 axi_dmac_reset_manager</h2>
+<h2 id="sec31">5.5 axi_dmac_reset_manager</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>axi_dmac_reset_manager.v</code> / <code>i_transfer.i_reset_manager</code></li>
   <li><b>역할:</b> <code>CONTROL.ENABLE</code> / <code>PAUSE</code>를 받아 블록들의 enable을 켜고 끕니다. ENABLE이 1→0이 되면 진행 중인 AXI 트랜잭션이 끝나기를 기다린 뒤 내부 리셋 <code>dma_resetn</code>을 몇 클럭 동안 0으로 만듭니다.</li>
@@ -758,14 +839,14 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <li><b>출력:</b> <code>req/src/dest/sg_enable</code>(모두 같은 값), <code>dma_resetn</code>(데이터 경로와 SG 엔진의 리셋), <code>dbg_status</code></li>
 </ul>
 
-<h2>5.6 dmac_sg (SG Engine)</h2>
+<h2 id="sec32">5.6 dmac_sg (SG Engine)</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>dmac_sg.v</code> / <code>i_transfer.i_dmac_sg</code></li>
   <li><b>역할:</b> SG 기능의 거의 전부입니다. descriptor 주소를 받아 <code>m_sg_axi</code>로 48B를 읽고, 필드를 레지스터에 저장한 뒤 전송 요청으로 내보냅니다. <code>LAST</code>가 아니면 <code>next</code> 주소로 다음 descriptor를 읽습니다.</li>
   <li><b>구성:</b> FSM 1개, 필드 레지스터, FIFO 3개, splitter 1개. 상세는 7장.</li>
 </ul>
 
-<h2>5.7 request_arb (Data Mover)</h2>
+<h2 id="sec33">5.7 request_arb (Data Mover)</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>request_arb.v</code> / <code>i_transfer.i_request_arb</code></li>
   <li><b>역할:</b> "주소 + 길이" 요청 하나를 받아 실제 AXI 읽기·쓰기를 합니다. 요청이 SG에서 왔는지 모릅니다.</li>
@@ -782,7 +863,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <tr><td><code>i_response_manager</code></td><td><code>axi_dmac_response_manager</code></td><td>B 응답을 레지스터 쪽으로 넘기고, 마지막 burst의 B에서 요청 완료(<code>eot</code>)를 냄 (5.12)</td></tr>
 </table>
 
-<h2>5.8 request_generator</h2>
+<h2 id="sec34">5.8 request_generator</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>request_generator.v</code> / <code>…i_request_arb.i_req_gen</code></li>
   <li><b>역할:</b> 요청 길이의 윗부분(<code>x_length[23:7]</code> = burst 개수 − 1)을 받아, burst마다 <code>request_id</code>를 하나씩 올립니다. 마지막 burst에서 <code>eot = 1</code>입니다.</li>
@@ -790,7 +871,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <li><b>조절:</b> DEST 응답 ID(<code>response_id</code>)를 한 바퀴 앞지르지 않도록 <code>incr_en = (response_id != id_next)</code>일 때만 ID를 올립니다(88행).</li>
 </ul>
 
-<h2>5.9 src_axi_mm</h2>
+<h2 id="sec35">5.9 src_axi_mm</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>src_axi_mm.v</code> / <code>…i_src_dma_mm</code> (안에 <code>i_addr_gen : address_generator</code>, <code>i_req_splitter : splitter</code>)</li>
   <li><b>역할:</b> 허락된 burst ID마다 AR을 하나 내고, R 데이터를 그대로 버퍼로 넘깁니다(<code>RREADY</code>는 항상 1). 마지막 R beat(<code>RLAST</code>)마다 데이터 ID를 올립니다.</li>
@@ -798,28 +879,28 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <li><b>바이트 수:</b> 마지막 beat의 유효 바이트 수를 burst ID별로 기억해 두었다가 데이터와 함께 버퍼에 넘깁니다.</li>
 </ul>
 
-<h2>5.10 axi_dmac_burst_memory</h2>
+<h2 id="sec36">5.10 axi_dmac_burst_memory</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>axi_dmac_burst_memory.v</code> / <code>…i_store_and_forward</code></li>
   <li><b>역할:</b> SRC와 DEST 사이의 1KB 버퍼(64bit × 128줄 RAM)입니다. burst 하나가 다 들어온 칸만 DEST로 내보냅니다(store-and-forward).</li>
   <li><b>칸 관리:</b> 칸 번호는 burst ID(Gray 코드)에서 만듭니다. 칸마다 "beat 수 − 1, 마지막 beat 유효 바이트 − 1"을 기록해 두었다가(<code>burst_len_mem</code>), DEST 쪽에서 마지막 beat의 <code>WSTRB</code>를 만듭니다(268행).</li>
 </ul>
 
-<h2>5.11 dest_axi_mm</h2>
+<h2 id="sec37">5.11 dest_axi_mm</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>dest_axi_mm.v</code> / <code>…i_dest_dma_mm</code> (안에 <code>i_addr_gen : address_generator</code>, <code>i_response_handler : response_handler</code>)</li>
   <li><b>역할:</b> 버퍼에 완성된 burst가 있으면 AW를 내고, 버퍼에서 나오는 데이터를 W 채널로 그대로 보냅니다. <code>response_handler</code>가 B 응답을 받아 burst ID와 함께 넘깁니다.</li>
   <li><b>그 밖:</b> burst ID마다 바이트 수를 기억해 두었다가, B 응답이 오면 함께 넘깁니다(→ TRANSFER_PROGRESS).</li>
 </ul>
 
-<h2>5.12 axi_dmac_response_manager</h2>
+<h2 id="sec38">5.12 axi_dmac_response_manager</h2>
 <ul>
   <li><b>파일 / 인스턴스:</b> <code>axi_dmac_response_manager.v</code> / <code>…i_response_manager</code></li>
   <li><b>역할:</b> DEST의 B 응답을 하나씩 레지스터 쪽에 넘깁니다. 그 burst가 요청의 마지막이면 <code>response_eot = 1</code>입니다(113행). 이것이 <code>dma_eot</code>입니다.</li>
   <li><b>상태:</b> <code>IDLE</code> → <code>ACC</code>(응답 받음) → <code>WRITE_RESPR</code>(레지스터 쪽으로 전달) 3개뿐입니다. B 응답에서 <code>dma_eot</code>까지 약 3클럭이 걸립니다.</li>
 </ul>
 
-<h2>5.13 Supporting Modules</h2>
+<h2 id="sec39">5.13 Supporting Modules</h2>
 <table>
   <tr><th style="width:24%">모듈</th><th>역할</th></tr>
   <tr><td><code>util_axis_fifo</code></td><td>단일 클럭 valid / ready FIFO. <code>ADDRESS_WIDTH = 0</code>이면 1단 레지스터(요청 전달용), 2면 최대 4개를 담는 FIFO(<code>dmac_sg</code>의 ID FIFO)</td></tr>
@@ -830,10 +911,10 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 </table>
 
 <!-- ===================================================================== -->
-<h1>6 Descriptor Format</h1>
+<h1 id="sec40">6 Descriptor Format</h1>
 <p>descriptor 1장은 메모리에 이어서 놓인 <b>48바이트(64bit × 6)</b>입니다. <code>dmac_sg</code>는 이것을 AXI 읽기 1번(<code>ARLEN=5</code>, <code>ARSIZE=3</code>, <code>ARBURST=INCR</code>)으로 가져옵니다.</p>
 
-<h2>6.1 Layout</h2>
+<h2 id="sec41">6.1 Layout</h2>
 <table>
   <tr><th style="width:9%">Offset</th><th class="c" style="width:6%">Beat</th><th style="width:17%">[63:32]</th><th style="width:17%">[31:0]</th><th>실제로 저장되는 것 (<code>dmac_sg.v</code> 185행 <code>case</code>)</th></tr>
   <tr><td>+0x00</td><td class="c">0</td><td><code>id</code></td><td><code>flags[1:0]</code> (나머지 0)</td><td><code>hwdesc_id ← rdata[63:32]</code> (32bit), <code>hwdesc_flags ← rdata[1:0]</code></td></tr>
@@ -845,7 +926,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 </table>
 <p>메모리 형식은 ADI가 64bit 주소와 2D 전송까지 담을 수 있게 정한 것입니다. 이 구성은 32bit 주소, 24bit 길이, 2D 없음이라 각 칸의 일부만 씁니다. 괄호 친 칸은 쓰지 않으므로 0으로 채우면 됩니다. 받은 beat 번호는 <code>hwdesc_counter</code>(0~5)가 셉니다.</p>
 
-<h2>6.2 Field Description</h2>
+<h2 id="sec42">6.2 Field Description</h2>
 <table>
   <tr><th style="width:18%">Field</th><th style="width:36%">뜻</th><th>이 구성의 규칙</th></tr>
   <tr><td><code>flags[0]</code> LAST</td><td>1이면 이 descriptor가 체인의 마지막</td><td>1이면 처리 후 FSM이 IDLE로. <code>next</code>는 무시</td></tr>
@@ -858,7 +939,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 </table>
 <p>자주 쓰는 <code>flags</code> 값: 마지막 장 <code>2'b11</code>(LAST + EOT_IRQ), 중간 장 <code>2'b00</code>.</p>
 
-<h2>6.3 Example (SAN-005 D0)</h2>
+<h2 id="sec43">6.3 Example (SAN-005 D0)</h2>
 <p>TB <code>write_desc(0x1100, 2'b00, 32'hB0, 0x21000, 0x11000, 0x1140, 128)</code>(570행)이 메모리에 쓰는 값입니다.</p>
 <table style="width:72%">
   <tr><th style="width:18%">주소</th><th style="width:44%">64bit 값</th><th>뜻</th></tr>
@@ -870,7 +951,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <tr><td>0x1128</td><td><code>0x00000000_00000000</code></td><td>쓰지 않음</td></tr>
 </table>
 
-<h2>6.4 Rules and Cautions</h2>
+<h2 id="sec44">6.4 Rules and Cautions</h2>
 <ul>
   <li><b>정렬:</b> 주소 레지스터는 [31:3]만 저장합니다. 8B로 정렬되지 않은 주소를 쓰면 하위 3bit가 경고 없이 버려집니다.</li>
   <li><b>길이 0은 없다:</b> <code>x_length = 0</code>이 이미 1바이트입니다. "0 − 1"을 쓰면 <code>0xFFFF_FFFF</code>가 24bit로 잘려 <code>0xFF_FFFF</code> = <b>16 MiB를 전송</b>합니다.</li>
@@ -880,10 +961,10 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 </ul>
 
 <!-- ===================================================================== -->
-<h1>7 SG Engine (dmac_sg) Architecture and FSM</h1>
+<h1 id="sec45">7 SG Engine (dmac_sg) Architecture and FSM</h1>
 <p><code>dmac_sg</code>는 4-state FSM이 <code>m_sg_axi</code>로 descriptor를 읽고, splitter가 같은 descriptor를 두 FIFO로 나눠 보내는 구조입니다. 하나는 전송 엔진으로, 하나는 완료 처리용입니다.</p>
 
-<h2>7.1 Internal Block Diagram</h2>
+<h2 id="sec46">7.1 Internal Block Diagram</h2>
 <figure>
 <div class="ftitle">dmac_sg는 descriptor를 읽은 뒤 전송용과 완료 처리용으로 나눈다</div>
 <svg viewBox="0 0 680 330">
@@ -935,7 +1016,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 </figure>
 <p>FSM이 AR 1번과 R 6 beat로 필드를 채우면 splitter가 필드는 <code>i_sg_desc_fifo</code>로, id와 EOT_IRQ 플래그는 <code>i_fifo</code>로 보냅니다. <code>i_fifo</code>는 <code>dma_eot</code>가 올 때마다 하나씩 빠집니다.</p>
 
-<h2>7.2 Internal Blocks</h2>
+<h2 id="sec47">7.2 Internal Blocks</h2>
 <table>
   <tr><th style="width:15%">블록</th><th style="width:28%">인스턴스 / 신호</th><th style="width:17%">폭 / 깊이</th><th>역할</th></tr>
   <tr><td>Address FIFO</td><td><code>i_sg_addr_fifo</code></td><td>29bit / 1단</td><td>SUBMIT 때의 SG_ADDRESS를 받음. 1단이라 체인이 도는 중에도 SUBMIT 1개를 미리 받아 둘 수 있음</td></tr>
@@ -947,7 +1028,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <tr><td>ID FIFO</td><td><code>i_fifo</code></td><td>33bit / 최대 4개</td><td>진행 중인 descriptor의 id와 EOT_IRQ 플래그. <code>dma_eot</code>마다 1개 출력. 출력값이 <code>DESCRIPTOR_ID</code></td></tr>
 </table>
 
-<h2>7.3 State Diagram</h2>
+<h2 id="sec48">7.3 State Diagram</h2>
 <figure>
 <div class="ftitle">네 상태로 descriptor 하나를 읽고, LAST가 다음 fetch와 IDLE을 가른다</div>
 <svg viewBox="0 0 680 280">
@@ -976,7 +1057,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 <figcaption>Figure 6. dmac_sg descriptor FSM (<code>hwdesc_state</code>, <code>dmac_sg.v</code> 199~235행). 파란 두 상태가 <code>m_sg_axi</code>를 쓰는 구간입니다.</figcaption>
 </figure>
 
-<h2>7.4 State Description</h2>
+<h2 id="sec49">7.4 State Description</h2>
 <table>
   <tr><th style="width:15%">State</th><th class="c" style="width:5%">값</th><th>하는 일</th><th style="width:16%">1이 되는 출력</th><th style="width:24%">다음 상태 조건</th></tr>
   <tr><td>IDLE</td><td class="c">0</td><td>첫 descriptor 주소를 기다림</td><td><code>sg_in_ready</code></td><td><code>sg_in_valid &amp; sg_enable</code> → SEND_ADDR</td></tr>
@@ -993,7 +1074,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <tr><td class="c">–</td><td><code>fetch_ready == 0</code></td><td>DESC_READY 유지</td><td>FIFO가 차서 대기</td></tr>
 </table>
 
-<h2>7.5 Transition Rules</h2>
+<h2 id="sec50">7.5 Transition Rules</h2>
 <ul>
   <li><code>next_desc_addr</code>는 두 곳에서 바뀝니다. IDLE에서 시작할 때는 주소 FIFO 값(SG_ADDRESS)으로, RECV_DESC의 beat 3에서는 descriptor의 <code>next</code> 값으로. 그래서 AR 주소 식(145행) 하나로 첫 descriptor와 이후 descriptor를 모두 처리합니다.</li>
   <li>AR 신호 중 주소만 바뀝니다. <code>ARLEN = 5</code>, <code>ARSIZE = 3</code>, <code>ARBURST = 1</code>, <code>ARCACHE = 0</code>, <code>ARPROT = 0</code>은 상수입니다.</li>
@@ -1001,7 +1082,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <li><code>sg_enabled = sg_enable | ~sg_in_ready</code> (132행). FSM이 IDLE이 아니면 1이고, reset manager는 이것을 "SG가 아직 정리 중"으로 봅니다.</li>
 </ul>
 
-<h2>7.6 Prefetch</h2>
+<h2 id="sec51">7.6 Prefetch</h2>
 <p><code>dmac_sg</code>는 데이터 전송이 끝나기를 기다리지 않습니다. descriptor FIFO가 D0를 받아 가면 FSM은 바로 SEND_ADDR로 돌아가 D1을 읽습니다. 그래서 descriptor 읽기가 데이터 전송보다 앞서 갑니다. 앞서 갈 수 있는 한도는 두 가지입니다.</p>
 <ul>
   <li><b>descriptor FIFO 1단:</b> 엔진이 이전 요청을 받아 가기 전에는 다음 descriptor가 DESC_READY에서 기다립니다.</li>
@@ -1010,10 +1091,10 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 <p>SAN-005 실측: descriptor AR이 4,215 / 4,295 / 4,375 ns에 나가고, 첫 DEST AW는 4,515 ns입니다. 세 장을 다 읽은 뒤에 첫 쓰기가 나갑니다(10.4절).</p>
 
 <!-- ===================================================================== -->
-<h1>8 Data Path and Burst Handling</h1>
+<h1 id="sec52">8 Data Path and Burst Handling</h1>
 <p><code>request_arb</code>는 요청 하나(= descriptor 하나)를 128B burst로 나누고, SRC에서 읽은 burst를 버퍼에 다 모은 뒤 DEST로 씁니다. 그 요청의 마지막 burst에 대한 B 응답이 오면 <code>eot</code>를 냅니다.</p>
 
-<h2>8.1 Data Path Diagram</h2>
+<h2 id="sec53">8.1 Data Path Diagram</h2>
 <figure>
 <div class="ftitle">burst 하나를 버퍼에 다 읽어 넣은 뒤에 쓴다</div>
 <svg viewBox="0 0 680 300">
@@ -1055,7 +1136,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 </figure>
 <p><code>i_req_gen</code>이 요청을 burst로 나누면 SRC가 burst 단위로 읽어 버퍼에 넣고, DEST는 완성된 burst만 꺼내 씁니다. DEST의 B 응답 중 요청의 마지막 burst에 대한 응답에서만 <code>eot</code>가 나갑니다.</p>
 
-<h2>8.2 Burst Splitting</h2>
+<h2 id="sec54">8.2 Burst Splitting</h2>
 <p>요청 길이(<code>x_length</code> = 바이트 수 − 1)를 비트로 잘라 burst 개수와 마지막 burst 길이를 구합니다.</p>
 <pre>x_length[23:7] = burst 개수 − 1        → i_req_gen (req_burst_count)
 x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src / dest
@@ -1093,7 +1174,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </figure>
 <p>MM→MM 구성이라 바이트 단위 길이가 허용됩니다. 시작 주소는 8B 정렬이어야 하므로, <code>WSTRB</code>가 1111_1111이 아닌 경우는 <b>전송의 마지막 beat 하나</b>뿐입니다.</p>
 
-<h2>8.3 Store-and-Forward Buffer</h2>
+<h2 id="sec55">8.3 Store-and-Forward Buffer</h2>
 <p><code>axi_dmac_burst_memory</code>(<code>i_store_and_forward</code>)는 burst 1개(16 beat)가 들어가는 칸 8개로 된 1KB 버퍼입니다.</p>
 <ul>
   <li>SRC 쪽은 burst의 마지막 beat(<code>RLAST</code>)까지 받아야 그 칸을 "완성"으로 표시합니다.</li>
@@ -1101,7 +1182,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <li>DEST가 느려도 SRC는 최대 8 burst까지 미리 읽습니다. 8칸이 모두 차면 SRC의 다음 AR이 멈춥니다.</li>
 </ul>
 
-<h2>8.4 Flow Control</h2>
+<h2 id="sec56">8.4 Flow Control</h2>
 <table>
   <tr><th style="width:26%">어디서</th><th>무엇이 막나</th></tr>
   <tr><td>SRC AR</td><td>버퍼 빈 칸이 없으면 <code>src_throttled_request_id</code>가 올라가지 않아 AR이 멈춤 (request_arb.v 399행)</td></tr>
@@ -1111,7 +1192,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>요청 입력</td><td><code>i_req_gen</code>과 <code>i_src_req_fifo</code>가 둘 다 받을 수 있을 때만 다음 요청(다음 descriptor)을 받음</td></tr>
 </table>
 
-<h2>8.5 End-of-Transfer Generation</h2>
+<h2 id="sec57">8.5 End-of-Transfer Generation</h2>
 <p><code>eot</code>는 DEST의 B 응답에서 만들어집니다.</p>
 <ol>
   <li><code>i_req_gen</code>은 burst마다 "이 burst가 요청의 마지막인가"를 <code>eot_mem_src[]</code>에 기록합니다(request_arb.v 222행). SRC가 AR을 내면 이 값이 <code>eot_mem_dest[]</code>로 옮겨집니다.</li>
@@ -1120,7 +1201,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </ol>
 <p>그래서 256B descriptor에서는 첫 번째 B가 아니라 <b>두 번째 B에서만</b> <code>dma_eot</code>가 나옵니다. SAN-005의 D1(256B)은 B가 4,895 ns와 5,085 ns에 오고, <code>dma_eot</code>는 5,115 ns입니다.</p>
 
-<h2>8.6 AXI Behavior Summary</h2>
+<h2 id="sec58">8.6 AXI Behavior Summary</h2>
 <table>
   <tr><th style="width:20%">항목</th><th>동작</th></tr>
   <tr><td>Burst type</td><td>INCR만 사용</td></tr>
@@ -1133,10 +1214,10 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 
 <!-- ===================================================================== -->
-<h1>9 Register Interface</h1>
+<h1 id="sec59">9 Register Interface</h1>
 <p>SG 동작에 꼭 필요한 레지스터는 CONTROL, IRQ 3종, TRANSFER_SUBMIT, SG_ADDRESS, DESCRIPTOR_ID입니다. 나머지는 상태 확인과 디버깅용입니다. 이름·리셋값·비트는 SGDMA-SFR-rel-v2.0.0과 같습니다.</p>
 
-<h2>9.1 Access Conventions</h2>
+<h2 id="sec60">9.1 Access Conventions</h2>
 <ul>
   <li><b>RO:</b> 읽기 전용 / <b>RW:</b> 읽기·쓰기 / <b>RO-C:</b> 파라미터로 정해진 고정값</li>
   <li><b>RW1C:</b> 1을 쓴 비트가 지워짐</li>
@@ -1146,7 +1227,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <li>모든 쓰기는 32bit 전체 쓰기입니다(<code>WSTRB</code> 무시). 없는 주소는 0이 읽히고 응답은 항상 OKAY입니다.</li>
 </ul>
 
-<h2>9.2 Register Map</h2>
+<h2 id="sec61">9.2 Register Map</h2>
 <table>
   <tr><th style="width:8%">Offset</th><th style="width:7%">RTL</th><th style="width:25%">Name</th><th style="width:8%">Access</th><th style="width:13%">Reset</th><th>용도</th></tr>
   <tr><td>0x000</td><td>0x000</td><td>VERSION</td><td>RO-C</td><td>0x0004_0565</td><td>IP 버전 (4.05.65)</td></tr>
@@ -1182,7 +1263,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 <p class="small">* <code>DESCRIPTOR_ID</code>는 HWDESC = 0이면 0입니다. HWDESC = 1인데 아직 완료된 descriptor가 없으면 값이 정해져 있지 않습니다(ID FIFO 출력 레지스터에 리셋이 없음. 시뮬레이션에서는 X).</p>
 <div class="info"><p><b>v1.0 / SFR 문서와 다른 점:</b> 0x450 <code>PARTIAL_TRANSFER_ID</code>는 이제 읽어도 내부 상태가 바뀌지 않습니다(이 기능의 FIFO가 삭제됨). 값은 전과 같이 0입니다. "0x450은 읽지 않는다"는 검증 규칙은 지켜도 되고 없애도 됩니다.</p></div>
 
-<h2>9.3 CONTROL (0x400)</h2>
+<h2 id="sec62">9.3 CONTROL (0x400)</h2>
 <table>
   <tr><th class="c" style="width:7%">Bit</th><th style="width:15%">Name</th><th style="width:9%">Access</th><th>설명</th></tr>
   <tr><td class="c">0</td><td>ENABLE</td><td>RW</td><td>1 = DMA 동작. 1→0이면 진행 중인 AXI를 마무리하고 내부를 리셋 (12.2)</td></tr>
@@ -1193,7 +1274,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 <p>네 비트가 한 번의 쓰기로 함께 바뀝니다. SG 모드로 시작하려면 <code>0x5</code>(ENABLE | HWDESC)를 씁니다. HWDESC는 전송 중에 바꾸지 않습니다.</p>
 
-<h2>9.4 IRQ_MASK / IRQ_PENDING / IRQ_SOURCE (0x080 / 0x084 / 0x088)</h2>
+<h2 id="sec63">9.4 IRQ_MASK / IRQ_PENDING / IRQ_SOURCE (0x080 / 0x084 / 0x088)</h2>
 <table>
   <tr><th class="c" style="width:7%">Bit</th><th style="width:30%">Name</th><th>이벤트가 일어나는 때</th></tr>
   <tr><td class="c">0</td><td>SOT (TRANSFER_QUEUED)</td><td>SUBMIT된 요청을 DMA가 받아들일 때. SG 모드에서는 <code>i_sg_addr_fifo</code>가 SG_ADDRESS를 받을 때. <b>완료가 아닙니다</b></td></tr>
@@ -1201,7 +1282,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 <p><code>IRQ_PENDING = ~IRQ_MASK &amp; IRQ_SOURCE</code>이고, <code>irq</code> 핀 = <code>|IRQ_PENDING</code> (1클럭 레지스터)입니다. IRQ_PENDING에 1을 쓰면 IRQ_SOURCE의 같은 비트가 지워집니다. 같은 클럭에 새 이벤트와 지우기가 겹치면 이벤트가 이깁니다.</p>
 
-<h2>9.5 DBG_STATUS (0x43C)</h2>
+<h2 id="sec64">9.5 DBG_STATUS (0x43C)</h2>
 <table>
   <tr><th class="c" style="width:8%">Bit</th><th style="width:18%">Name</th><th>설명</th></tr>
   <tr><td class="c">11</td><td>needs_reset</td><td>ENABLE이 0이 된 적이 있어 리셋이 예약됨</td></tr>
@@ -1213,7 +1294,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td class="c">2:0</td><td>state</td><td>reset manager 상태: 0 DO_RESET, 1 RESET, 2 DISABLED, 3 STARTUP, 4 ENABLED, 5 SHUTDOWN</td></tr>
 </table>
 
-<h2>9.6 DBG_IDS0 / DBG_IDS1 (0x440 / 0x444)</h2>
+<h2 id="sec65">9.6 DBG_IDS0 / DBG_IDS1 (0x440 / 0x444)</h2>
 <p><code>request_arb</code> 안의 burst ID 8개를 보여 줍니다. 바이트마다 [3:0]에 4bit Gray 코드 ID가 있습니다. 같은 쪽 ID들이 서로 다르면 그 사이 단계에서 burst가 처리 중이라는 뜻입니다. 모든 ID가 같으면 그 쪽은 쉬는 중입니다.</p>
 <table>
   <tr><th style="width:16%">Register</th><th>[27:24]</th><th>[19:16]</th><th>[11:8]</th><th>[3:0]</th></tr>
@@ -1222,10 +1303,10 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 
 <!-- ===================================================================== -->
-<h1>10 Operation Flow</h1>
+<h1 id="sec66">10 Operation Flow</h1>
 <p>SW는 descriptor를 메모리에 쓰고 레지스터 3개(CONTROL, SG_ADDRESS, TRANSFER_SUBMIT)만 설정하면 됩니다. 그 뒤 체인 끝까지 하드웨어가 처리하고, EOT_IRQ가 켜진 descriptor에서 인터럽트가 납니다.</p>
 
-<h2>10.1 Programming Sequence</h2>
+<h2 id="sec67">10.1 Programming Sequence</h2>
 <table>
   <tr><th class="c" style="width:6%">순서</th><th style="width:18%">SW 동작</th><th style="width:30%">레지스터 / 메모리</th><th>비고</th></tr>
   <tr><td class="c">1</td><td>인터럽트 설정</td><td><code>IRQ_MASK ← 0x1</code></td><td>SOT는 막고 EOT만 허용 (1 = 막음)</td></tr>
@@ -1237,7 +1318,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td class="c">7</td><td>정리</td><td><code>IRQ_PENDING</code> 읽기 → 같은 값 쓰기 (W1C)</td><td>필요하면 <code>DESCRIPTOR_ID</code> 읽기 (= 마지막 descriptor의 id)</td></tr>
 </table>
 
-<h2>10.2 Transfer Flow Chart</h2>
+<h2 id="sec68">10.2 Transfer Flow Chart</h2>
 <figure>
 <div class="ftitle">SW는 레지스터 세 개만 쓰고, SG 엔진은 LAST까지 반복한다</div>
 <svg viewBox="0 0 680 560">
@@ -1283,7 +1364,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 <figcaption>Figure 9. SG transfer flow chart. 두 레인은 동시에 돌고, 오른쪽 레인은 descriptor 수만큼 반복됩니다.</figcaption>
 </figure>
 
-<h2>10.3 Step-by-Step with RTL (SAN-005)</h2>
+<h2 id="sec69">10.3 Step-by-Step with RTL (SAN-005)</h2>
 <p>TB SAN-005(descriptor 3장 gather)에서 각 단계가 어느 코드에서 일어나는지, 그리고 실측 시각을 정리했습니다. D0 @0x1100 (128B), D1 @0x1140 (256B), D2 @0x1180 (64B, flags = 11). 시각은 <code>make sim</code> 실측(ns)입니다.</p>
 <table>
   <tr><th style="width:11%">단계</th><th>일어나는 일</th><th style="width:28%">파일 : 행</th><th class="c" style="width:9%">실측 (ns)</th></tr>
@@ -1302,7 +1383,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>13. 정리</td><td>TB <code>clear_irq</code> (W1C), <code>DESCRIPTOR_ID = 0xB2</code> 확인</td><td><code>tb_sg_dma.sv</code> 575~591</td><td class="c">–</td></tr>
 </table>
 
-<h2>10.4 Timing Overview</h2>
+<h2 id="sec70">10.4 Timing Overview</h2>
 <figure>
 <div class="ftitle">descriptor 읽기가 데이터보다 앞서 가고, irq는 마지막 descriptor에서만 올라간다</div>
 <svg viewBox="0 0 700 360">
@@ -1399,10 +1480,10 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </ul>
 
 <!-- ===================================================================== -->
-<h1>11 Interrupt and Status</h1>
+<h1 id="sec71">11 Interrupt and Status</h1>
 <p>SG 모드의 인터럽트는 descriptor마다가 아니라 <b>EOT_IRQ 플래그가 켜진 descriptor마다</b> 납니다. 모든 descriptor에서 <code>dma_eot</code>는 나오지만, 플래그가 0이면 레지스터 쪽으로 올라가지 않습니다.</p>
 
-<h2>11.1 Interrupt Path</h2>
+<h2 id="sec72">11.1 Interrupt Path</h2>
 <figure>
 <div class="ftitle">dma_eot와 EOT 플래그가 AND되어야 IRQ_SOURCE[1]이 선다</div>
 <svg viewBox="0 0 680 240">
@@ -1439,7 +1520,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 <figcaption>Figure 11. Interrupt path. SG 모드에서는 <code>dma_eot</code>와 ID FIFO의 EOT 플래그가 AND되어 <code>req_eot</code>가 되고(<code>axi_dmac_transfer.v</code> 203행), <code>up_eot</code>가 IRQ_SOURCE[1]을 세웁니다. 마스크를 통과한 비트가 하나라도 있으면 1클럭 뒤 <code>irq = 1</code>.</figcaption>
 </figure>
 
-<h2>11.2 Event Summary</h2>
+<h2 id="sec73">11.2 Event Summary</h2>
 <table>
   <tr><th style="width:15%">이벤트</th><th style="width:38%">일어나는 조건 (SG 모드)</th><th>바뀌는 상태</th></tr>
   <tr><td>SOT</td><td>TRANSFER_SUBMIT 뒤 <code>i_sg_addr_fifo</code>가 요청을 받음. 이전 체인이 도는 중이어도 FIFO가 비어 있으면 바로 받음</td><td>IRQ_SOURCE[0], TRANSFER_ID +1, TRANSFER_DONE[번호] ← 0, TRANSFER_SUBMIT ← 0</td></tr>
@@ -1447,7 +1528,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>EOT</td><td>descriptor 완료 + 그 descriptor의 EOT_IRQ = 1</td><td>IRQ_SOURCE[1], ACTIVE_TRANSFER_ID +1, TRANSFER_DONE[번호] ← 1, TRANSFER_PROGRESS ← 0</td></tr>
 </table>
 
-<h2>11.3 Transfer vs Descriptor</h2>
+<h2 id="sec74">11.3 Transfer vs Descriptor</h2>
 <p>레지스터 쪽에서 보면 <b>SUBMIT 1번 = transfer 1개</b>입니다. 체인에 descriptor가 몇 장이든 SOT는 1번입니다.</p>
 <ul>
   <li>마지막 descriptor에만 EOT_IRQ를 켜면 SOT 1번, EOT 1번이 되어 TRANSFER_ID와 ACTIVE_TRANSFER_ID가 같이 움직입니다. <b>권장 설정</b>입니다.</li>
@@ -1455,7 +1536,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <li>모든 descriptor의 EOT_IRQ가 0이면 체인이 끝나도 TRANSFER_DONE, IRQ가 바뀌지 않습니다. 완료는 메모리로만 알 수 있습니다.</li>
 </ul>
 
-<h2>11.4 Interrupt Handling Rules</h2>
+<h2 id="sec75">11.4 Interrupt Handling Rules</h2>
 <ul>
   <li><code>irq</code>는 level 신호입니다. IRQ_PENDING이 0이 될 때까지 1을 유지합니다. level 트리거로 연결합니다.</li>
   <li>지우는 방법: IRQ_PENDING을 읽고 같은 값을 다시 씁니다(W1C). 마스크된 비트는 IRQ_SOURCE에 남습니다(SAN-006: IRQ_SOURCE[0] = 1 유지).</li>
@@ -1465,10 +1546,10 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </ul>
 
 <!-- ===================================================================== -->
-<h1>12 ENABLE / PAUSE Control</h1>
+<h1 id="sec76">12 ENABLE / PAUSE Control</h1>
 <p><code>axi_dmac_reset_manager</code>는 CONTROL의 ENABLE과 PAUSE를 받아, 각 블록을 켜고 끄는 순서를 정합니다. 끌 때는 <b>이미 버스에 낸 요청은 끝까지 마무리</b>한 뒤에 멈춥니다.</p>
 
-<h2>12.1 Reset Manager FSM</h2>
+<h2 id="sec77">12.1 Reset Manager FSM</h2>
 <figure>
 <div class="ftitle">ENABLE=0은 SHUTDOWN을 거쳐 내부 리셋까지, PAUSE는 DISABLED에서 멈춘다</div>
 <svg viewBox="0 0 680 268">
@@ -1494,7 +1575,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </figure>
 <p>DO_RESET에서 수 클럭 길이의 내부 리셋 펄스가 시작되고, 그것이 풀려야(<code>dma_resetn = 1</code>) RESET에서 다음으로 갈 수 있습니다. 내부 리셋은 데이터 경로와 SG 엔진 전체에 걸리며, 레지스터(CONTROL, IRQ, 주소 등)에는 걸리지 않습니다.</p>
 
-<h2>12.2 ENABLE = 0</h2>
+<h2 id="sec78">12.2 ENABLE = 0</h2>
 <ul>
   <li>새 요청 받기를 멈추고, 이미 낸 AR의 R과 AW의 W/B는 끝까지 마무리합니다(SHUTDOWN). 그 뒤 내부 리셋.</li>
   <li><b>지워지는 것:</b> TRANSFER_ID, ACTIVE_TRANSFER_ID, TRANSFER_DONE, TRANSFER_SUBMIT, TRANSFER_PROGRESS, 데이터 경로와 SG 엔진의 상태(남은 descriptor는 버려짐).</li>
@@ -1502,7 +1583,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <li>DBG_STATUS[2:0]이 1(RESET)에서 멈춰 있으면 정리가 끝난 것입니다. 다시 <code>CONTROL ← 0x5</code>로 켭니다.</li>
 </ul>
 
-<h2>12.3 PAUSE = 1</h2>
+<h2 id="sec79">12.3 PAUSE = 1</h2>
 <ul>
   <li>각 블록을 멈추되 리셋하지 않습니다. 이미 낸 버스 요청은 마무리되므로 PAUSE 직후에는 값이 조금 더 바뀔 수 있습니다. 버스가 조용해진 뒤에 상태를 읽습니다.</li>
   <li>PAUSE를 풀면(<code>CONTROL ← 0x5</code>) 멈춘 자리부터 이어 갑니다. 단일 descriptor 전송에서는 이렇게 동작함을 확인했습니다.</li>
@@ -1511,7 +1592,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 <p>512B × 8장 체인으로 확인한 결과, 시작 60~300클럭 뒤에 PAUSE를 걸면 3~7장만 복사되고 끝났고, 420클럭 이후(체인을 모두 읽은 뒤)에 걸면 정상으로 끝났습니다. 정리 전 ADI 코드도 똑같이 동작합니다. 체인 진행 중에는 PAUSE 대신 끝나기를 기다리거나, ENABLE=0으로 끊고 처음부터 다시 시작합니다.</p></div>
 
 <!-- ===================================================================== -->
-<h1>13 Debug Signal Guide</h1>
+<h1 id="sec80">13 Debug Signal Guide</h1>
 <p>파형은 "외부 포트 → SG 엔진 → MUX → 데이터 엔진 → 완료 / IRQ" 순서로 그룹을 만들어 보면 요청이 어디서 멈췄는지 바로 보입니다. 아래 경로는 xsim 계층 기준이며 약어로 씁니다.</p>
 <table style="width:70%">
   <tr><th style="width:18%">약어</th><th>전체 경로</th></tr>
@@ -1525,7 +1606,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 <p class="small">v1.0의 <code>tb_sg_dma.dut.i_axi_dmac…</code> 경로는 이제 없습니다. <code>i_axi_dmac</code> 단계를 빼면 됩니다.</p>
 
-<h2>13.1 Group A — External Interfaces</h2>
+<h2 id="sec81">13.1 Group A — External Interfaces</h2>
 <table>
   <tr><th style="width:36%">신호</th><th style="width:8%">위치</th><th>확인할 것</th></tr>
   <tr><td><code>s_axi_aw*</code>, <code>s_axi_w*</code>, <code>s_axi_b*</code></td><td>TOP</td><td>레지스터 쓰기 주소·값. <code>bresp</code>는 항상 OKAY</td></tr>
@@ -1536,7 +1617,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td><code>irq</code></td><td>TOP</td><td>완료 시 1, W1C 뒤 0</td></tr>
 </table>
 
-<h2>13.2 Group B — Control and Status</h2>
+<h2 id="sec82">13.2 Group B — Control and Status</h2>
 <table>
   <tr><th style="width:36%">신호</th><th style="width:8%">위치</th><th>뜻</th></tr>
   <tr><td><code>ctrl_enable</code>, <code>ctrl_hwdesc</code>, <code>ctrl_pause</code></td><td>REG</td><td>CONTROL 레지스터 값</td></tr>
@@ -1549,7 +1630,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td><code>sg_enable</code>, <code>sg_enabled</code></td><td>TR</td><td>SG 쪽 enable / 동작 중</td></tr>
 </table>
 
-<h2>13.3 Group C — SG Engine</h2>
+<h2 id="sec83">13.3 Group C — SG Engine</h2>
 <table>
   <tr><th style="width:36%">신호</th><th style="width:8%">위치</th><th>뜻 / 확인할 것</th></tr>
   <tr><td><code>hwdesc_state</code></td><td>SG</td><td>0 IDLE, 1 SEND_ADDR, 2 RECV_DESC, 3 DESC_READY</td></tr>
@@ -1564,7 +1645,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td><code>resp_out_id</code>, <code>resp_out_eot</code></td><td>SG</td><td>ID FIFO 맨 앞의 id / EOT 플래그</td></tr>
 </table>
 
-<h2>13.4 Group D — Request MUX and Data Engine</h2>
+<h2 id="sec84">13.4 Group D — Request MUX and Data Engine</h2>
 <table>
   <tr><th style="width:36%">신호</th><th style="width:8%">위치</th><th>뜻</th></tr>
   <tr><td><code>dma_req_valid</code>, <code>dma_req_ready</code></td><td>TR</td><td>MUX 출력 → <code>request_arb</code> 요청</td></tr>
@@ -1576,7 +1657,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td><code>src_throttled_request_id</code></td><td>ARB</td><td>SRC가 AR을 낼 수 있는 burst ID (버퍼 빈 칸 반영)</td></tr>
 </table>
 
-<h2>13.5 Reading Stuck Points</h2>
+<h2 id="sec85">13.5 Reading Stuck Points</h2>
 <table>
   <tr><th style="width:26%">증상</th><th style="width:32%">의심 위치</th><th>확인 신호</th></tr>
   <tr><td>SUBMIT 후 <code>m_sg_axi</code> AR이 안 나옴</td><td>ENABLE / HWDESC 미설정, reset manager가 ENABLED가 아님</td><td><code>ctrl_enable</code>, <code>ctrl_hwdesc</code>, <code>RST.state</code>, <code>SG.hwdesc_state</code></td></tr>
@@ -1589,10 +1670,10 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 
 <!-- ===================================================================== -->
-<h1>14 CPU-Side Tracing</h1>
+<h1 id="sec86">14 CPU-Side Tracing</h1>
 <p>CPU가 SG 진행 상황을 볼 수 있는 방법은 레지스터 읽기뿐입니다. 이 IP는 완료 상태를 descriptor 메모리에 다시 써 주지 않고(write-back 없음), <code>dmac_sg</code> FSM 상태나 지금 읽고 있는 descriptor 주소를 보여 주는 레지스터도 없습니다.</p>
 
-<h2>14.1 What Software Can Read</h2>
+<h2 id="sec87">14.1 What Software Can Read</h2>
 <table>
   <tr><th style="width:22%">알고 싶은 것</th><th style="width:34%">레지스터</th><th>읽는 법</th></tr>
   <tr><td>DMA가 켜져 있나</td><td>CONTROL (0x400), DBG_STATUS[2:0] (0x43C)</td><td>ENABLE = 1, state = 4 (ENABLED)이면 정상</td></tr>
@@ -1606,7 +1687,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>각 블록 상태</td><td>DBG_STATUS (0x43C)</td><td>enable 비트, reset manager 상태 (9.5)</td></tr>
 </table>
 
-<h2>14.2 Recommended Tracing Methods</h2>
+<h2 id="sec88">14.2 Recommended Tracing Methods</h2>
 <ol>
   <li><b>descriptor별 완료 추적:</b> 디버깅할 때는 모든 descriptor에 서로 다른 <code>id</code>를 붙이고 DESCRIPTOR_ID를 주기적으로 읽습니다. 값이 바뀌는 순서가 완료 순서입니다.</li>
   <li><b>중간 인터럽트:</b> 특정 descriptor에서 알림을 받고 싶으면 그 descriptor의 EOT_IRQ를 켭니다. 단, transfer 카운터의 뜻이 달라집니다(11.3).</li>
@@ -1615,7 +1696,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <li><b>강제 정지:</b> <code>CONTROL ← 0x4</code>(ENABLE만 끔)을 쓰면 진행 중인 AXI를 마무리한 뒤 전체가 리셋됩니다. DBG_STATUS[2:0]이 1(RESET)이 된 것을 확인하고 다시 켭니다.</li>
 </ol>
 
-<h2>14.3 What Software Cannot See</h2>
+<h2 id="sec89">14.3 What Software Cannot See</h2>
 <table>
   <tr><th style="width:26%">정보</th><th style="width:30%">상태</th><th>대안</th></tr>
   <tr><td><code>dmac_sg</code> FSM 상태</td><td>레지스터 없음</td><td>DBG_STATUS[3] <code>enabled_sg</code>로 SG가 동작 중인지만 확인</td></tr>
@@ -1625,10 +1706,10 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 
 <!-- ===================================================================== -->
-<h1>15 Error Model and Debug Checklist</h1>
+<h1 id="sec90">15 Error Model and Debug Checklist</h1>
 <p>이 IP에는 에러 상태, 에러 코드 레지스터, 에러 인터럽트가 없습니다. AXI 에러 응답을 포함한 대부분의 비정상 입력은 <b>멈추지 않고 그대로 진행</b>하므로, 문제는 결과 데이터와 상태 레지스터로 간접 확인해야 합니다. (기본 AXI DMA 스펙의 ERROR_CODE / STATUS.ERROR 같은 것이 없습니다.)</p>
 
-<h2>15.1 Error Conditions and Hardware Behavior</h2>
+<h2 id="sec91">15.1 Error Conditions and Hardware Behavior</h2>
 <table>
   <tr><th style="width:17%">조건</th><th style="width:22%">RTL 동작</th><th style="width:22%">결과</th><th style="width:22%">확인 방법</th><th style="width:9%">SOR</th></tr>
   <tr><td>descriptor fetch에서 RRESP = SLVERR / DECERR</td><td><code>m_sg_axi_rresp</code>가 내부에 연결되어 있지 않음</td><td>잘못된 데이터를 descriptor로 사용</td><td><code>m_sg_axi_rresp</code> 파형, 이후 엉뚱한 SRC / DEST 주소</td><td>T-15</td></tr>
@@ -1645,7 +1726,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>HWDESC = 1, 완료 전 DESCRIPTOR_ID 읽기</td><td>ID FIFO 출력 레지스터에 리셋 없음</td><td>값이 정해져 있지 않음 (시뮬레이션 X)</td><td>DESCRIPTOR_ID 읽기</td><td>T-08</td></tr>
 </table>
 
-<h2>15.2 Recovery</h2>
+<h2 id="sec92">15.2 Recovery</h2>
 <ol>
   <li><code>CONTROL ← 0x0</code> (또는 0x4). reset manager가 진행 중인 AXI를 마무리하고 데이터 경로를 리셋합니다.</li>
   <li>DBG_STATUS[2:0]이 1(RESET)이 될 때까지 기다립니다.</li>
@@ -1654,7 +1735,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </ol>
 <p>SLVERR / DECERR 뒤에도 IP는 멈추지 않으므로, 에러 응답을 알아차리는 일은 인터커넥트나 메모리 쪽 모니터, 또는 TB의 AXI 체커가 맡아야 합니다.</p>
 
-<h2>15.3 Debug Checklist</h2>
+<h2 id="sec93">15.3 Debug Checklist</h2>
 <div class="avoid">
 <h4>IRQ가 오지 않을 때</h4>
 <ul class="chk">
@@ -1689,7 +1770,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </div>
 
 <!-- ===================================================================== -->
-<h1>Appendix A. Verification Team Q&amp;A</h1>
+<h1 id="sec94">Appendix A. Verification Team Q&amp;A</h1>
 <p>검증팀 질문마다 이 문서의 어느 부분이 답인지 정리했습니다.</p>
 <table>
   <tr><th style="width:26%">질문</th><th style="width:16%">답이 있는 곳</th><th>요약</th></tr>
@@ -1702,7 +1783,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>에러가 났을 때 볼 부분은?</td><td>15장</td><td>에러 레지스터 없음, AXI 에러 응답 무시. 조건별 동작 표와 체크리스트</td></tr>
 </table>
 
-<h2>A.1 Open Items for Verification</h2>
+<h2 id="sec95">A.1 Open Items for Verification</h2>
 <table>
   <tr><th style="width:24%">항목</th><th>내용</th><th style="width:15%">관련</th></tr>
   <tr><td><b>체인 도중 PAUSE</b></td><td>체인을 다 읽기 전에 PAUSE를 걸면 남은 descriptor를 버리고 EOT가 나지 않음 (확인됨). 의도된 동작인지, 드라이버 제약으로 둘지, RTL을 고칠지 결정 필요</td><td>12.3, 15.1, T-12</td></tr>
