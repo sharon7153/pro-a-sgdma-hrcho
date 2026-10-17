@@ -1,74 +1,50 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/sg_dma/sg_dma_top.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/sg_dma_top.v" into library work
 INFO: [VRFC 10-311] analyzing module sg_dma_top
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/address_generator.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/address_generator.v" into library work
 INFO: [VRFC 10-311] analyzing module address_generator
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_burst_memory.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_burst_memory.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_burst_memory
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_ext_sync.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_ext_sync.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_ext_sync
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_framelock.v" into library work
-INFO: [VRFC 10-311] analyzing module axi_dmac_framelock
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_regmap_request.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_regmap_request.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_regmap_request
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_regmap.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_regmap.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_regmap
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_reset_manager.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_reset_manager.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_reset_manager
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_resize_dest.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_resize_dest.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_resize_dest
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_resize_src.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_resize_src.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_resize_src
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_response_manager.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_response_manager.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_response_manager
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_transfer.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_transfer.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac_transfer
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_dmac
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_register_slice.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_register_slice.v" into library work
 INFO: [VRFC 10-311] analyzing module axi_register_slice
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/data_mover.v" into library work
-INFO: [VRFC 10-311] analyzing module data_mover
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dest_axi_mm.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/dest_axi_mm.v" into library work
 INFO: [VRFC 10-311] analyzing module dest_axi_mm
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dest_axi_stream.v" into library work
-INFO: [VRFC 10-311] analyzing module dest_axi_stream
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dest_fifo_inf.v" into library work
-INFO: [VRFC 10-311] analyzing module dest_fifo_inf
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dmac_2d_transfer.v" into library work
-INFO: [VRFC 10-311] analyzing module dmac_2d_transfer
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dmac_sg.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/dmac_sg.v" into library work
 INFO: [VRFC 10-311] analyzing module dmac_sg
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/request_arb.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/request_arb.v" into library work
 INFO: [VRFC 10-311] analyzing module request_arb
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/request_generator.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/request_generator.v" into library work
 INFO: [VRFC 10-311] analyzing module request_generator
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/response_generator.v" into library work
-INFO: [VRFC 10-311] analyzing module response_generator
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/response_handler.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/response_handler.v" into library work
 INFO: [VRFC 10-311] analyzing module response_handler
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/splitter.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/splitter.v" into library work
 INFO: [VRFC 10-311] analyzing module splitter
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/src_axi_mm.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/src_axi_mm.v" into library work
 INFO: [VRFC 10-311] analyzing module src_axi_mm
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/src_axi_stream.v" into library work
-INFO: [VRFC 10-311] analyzing module src_axi_stream
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/src_fifo_inf.v" into library work
-INFO: [VRFC 10-311] analyzing module src_fifo_inf
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/common/ad_mem_asym.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/ad_mem_asym.v" into library work
 INFO: [VRFC 10-311] analyzing module ad_mem_asym
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/common/ad_mem.v" into library work
-INFO: [VRFC 10-311] analyzing module ad_mem
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/common/up_axi.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/up_axi.v" into library work
 INFO: [VRFC 10-311] analyzing module up_axi
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/util_axis_fifo/util_axis_fifo_address_generator.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/util_axis_fifo_address_generator.v" into library work
 INFO: [VRFC 10-311] analyzing module util_axis_fifo_address_generator
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/util_axis_fifo/util_axis_fifo.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/util_axis_fifo.v" into library work
 INFO: [VRFC 10-311] analyzing module util_axis_fifo
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/util_cdc/sync_bits.v" into library work
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/sync_bits.v" into library work
 INFO: [VRFC 10-311] analyzing module sync_bits
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/util_cdc/sync_data.v" into library work
-INFO: [VRFC 10-311] analyzing module sync_data
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/util_cdc/sync_event.v" into library work
-INFO: [VRFC 10-311] analyzing module sync_event
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/util_cdc/sync_gray.v" into library work
-INFO: [VRFC 10-311] analyzing module sync_gray

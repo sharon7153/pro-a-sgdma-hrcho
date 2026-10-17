@@ -5,14 +5,14 @@ Running: /tools/Xilinx/Vivado/2024.2/bin/unwrapped/lnx64.o/xelab tb_sg_dma -debu
 Multi-threading is on. Using 14 slave threads.
 Starting static elaboration
 Pass Through NonSizing Optimizer
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_regmap_request.v:436]
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/request_arb.v:441]
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/request_arb.v:1036]
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/request_arb.v:1063]
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/axi_dmac_response_manager.v:115]
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dmac_sg.v:157]
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dmac_sg.v:265]
-WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/third_party/adi_hdl/library/axi_dmac/dmac_sg.v:319]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_regmap_request.v:436]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/request_arb.v:441]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/request_arb.v:1036]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/request_arb.v:1063]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/axi_dmac_response_manager.v:115]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/dmac_sg.v:157]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/dmac_sg.v:265]
+WARNING: [VRFC 10-3645] port 'm_axis_tkeep' remains unconnected for this instance [/home/hrsc/Workspace/pro-a-sgdma-hrcho/rtl/dmac_sg.v:319]
 Completed static elaboration
 Starting simulation data flow analysis
 Completed simulation data flow analysis
