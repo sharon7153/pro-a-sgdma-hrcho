@@ -1,0 +1,1 @@
+"tb_sg_dma" -debug "typical" -s "tb_sg_dma_snap" -log "xelab.log" 

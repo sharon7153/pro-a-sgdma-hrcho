@@ -1,0 +1,6 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/tb/common/tb_mem_pkg.sv" into library work
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/tb/common/axi_mem_slave.sv" into library work
+INFO: [VRFC 10-311] analyzing module axi_rd_slave
+INFO: [VRFC 10-311] analyzing module axi_wr_slave
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/hrsc/Workspace/pro-a-sgdma-hrcho/tb/sg_dma/tb_sg_dma.sv" into library work
+INFO: [VRFC 10-311] analyzing module tb_sg_dma
