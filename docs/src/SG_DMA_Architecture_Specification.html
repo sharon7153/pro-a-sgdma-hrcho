@@ -258,8 +258,8 @@
   <tr><th style="width:18%">용어</th><th>뜻</th></tr>
   <tr><td>DMA</td><td>Direct Memory Access. CPU 대신 메모리 복사를 해 주는 하드웨어</td></tr>
   <tr><td>SG</td><td>Scatter-Gather. 여기저기 흩어진 메모리 조각들을 "할 일 목록" 하나로 이어서 처리하는 방식</td></tr>
-  <tr><td>Descriptor</td><td>할 일 하나(어디서 읽고, 어디에 쓰고, 몇 바이트인지)를 적은 48바이트 메모. 메모리에 있음</td></tr>
-  <tr><td>Chain</td><td>descriptor들이 "다음 장 주소(next)"로 줄줄이 이어진 목록</td></tr>
+  <tr><td>Descriptor</td><td>할 일 하나(어디서 읽고, 어디에 쓰고, 몇 바이트인지)를 적은 48바이트 데이터 구조. 메모리에 있음</td></tr>
+  <tr><td>Chain</td><td>descriptor들이 "다음 descriptor 주소(next)"로 줄줄이 이어진 목록</td></tr>
   <tr><td>beat</td><td>AXI 데이터 한 번 전송. 이 IP에서는 64bit = 8바이트</td></tr>
   <tr><td>burst</td><td>주소 한 번에 이어서 보내는 beat 묶음. <code>AxLEN + 1</code>개. 이 IP는 최대 16 beat = 128바이트</td></tr>
   <tr><td>SOT / EOT</td><td>Start Of Transfer(전송 접수) / End Of Transfer(전송 완료) 이벤트</td></tr>
@@ -267,7 +267,7 @@
   <tr><td>SFR</td><td>Special Function Register. CPU가 읽고 쓰는 레지스터</td></tr>
   <tr><td>valid / ready</td><td>보내는 쪽이 valid=1, 받는 쪽이 ready=1인 클럭에 데이터가 넘어가는 핸드셰이크</td></tr>
   <tr><td>FIFO</td><td>먼저 들어간 것이 먼저 나오는 대기열</td></tr>
-  <tr><td>prefetch</td><td>앞 일을 하는 동안 다음 할 일 메모를 미리 읽어 두는 것</td></tr>
+  <tr><td>prefetch</td><td>앞 일을 하는 동안 다음 descriptor를 미리 읽어 두는 것</td></tr>
   <tr><td>Gray 코드</td><td>이웃한 값끼리 1비트만 다른 숫자 표기. 내부 burst 번호에 쓰임</td></tr>
 </table>
 
@@ -297,7 +297,7 @@
 
 <h2 id="sec9">2.2 Why Scatter-Gather</h2>
 <p>실제 버퍼는 메모리 여러 곳에 흩어져 있는 경우가 많습니다. 예를 들어 OS가 잡아 준 버퍼는 4KB 페이지 단위로 물리 주소가 흩어져 있습니다. Simple DMA로 조각 N개를 옮기려면 CPU가 N번 설정하고 N번 인터럽트를 처리해야 합니다.</p>
-<p>SG DMA에서는 CPU가 할 일 목록(descriptor)을 메모리에 미리 써 두고, <b>첫 descriptor 주소 하나만</b> DMA에 알려 줍니다. DMA는 descriptor를 한 장씩 읽어 처리하고, <code>next</code> 주소를 따라 다음 장으로 넘어가며, <code>LAST</code> 표시가 있는 장에서 멈춥니다.</p>
+<p>SG DMA에서는 CPU가 할 일 목록(descriptor)을 메모리에 미리 써 두고, <b>첫 descriptor 주소 하나만</b> DMA에 알려 줍니다. DMA는 descriptor를 하나씩 읽어 처리하고, <code>next</code> 주소를 따라 다음 descriptor로 넘어가며, <code>LAST</code> 표시가 있는 descriptor에서 멈춥니다.</p>
 <table>
   <tr><th style="width:24%">항목</th><th style="width:30%">Simple DMA</th><th>SG DMA</th></tr>
   <tr><td>전송 정보 위치</td><td>레지스터 (SRC / DST / LEN)</td><td>메모리의 descriptor</td></tr>
@@ -308,10 +308,10 @@
 </table>
 
 <h2 id="sec10">2.3 Descriptor Chain Example</h2>
-<p>이 문서 전체에서 TB의 <b>SAN-005</b>(descriptor 3장 gather)를 예제로 씁니다. CPU는 <code>SG_ADDRESS</code>에 D0 주소만 씁니다. DMA는 D0 → D1 → D2를 <code>next</code>로 따라가며 흩어진 A, B, C를 <code>0x21000</code>부터 이어 붙이고, LAST가 있는 D2에서 멈춥니다.</p>
+<p>이 문서 전체에서 TB의 <b>SAN-005</b>(descriptor 3개 gather)를 예제로 씁니다. CPU는 <code>SG_ADDRESS</code>에 D0 주소만 씁니다. DMA는 D0 → D1 → D2를 <code>next</code>로 따라가며 흩어진 A, B, C를 <code>0x21000</code>부터 이어 붙이고, LAST가 있는 D2에서 멈춥니다.</p>
 
 <figure>
-<div class="ftitle">SG_ADDRESS를 한 번 쓰면 descriptor 3장을 따라가며 조각 3개를 모은다</div>
+<div class="ftitle">SG_ADDRESS를 한 번 쓰면 descriptor 3개를 따라가며 조각 3개를 모은다</div>
 <svg viewBox="0 0 680 300">
   <text x="20" y="18" class="s mu">SG_ADDRESS = 0x1100 (CPU가 씀)</text>
   <path class="ln" d="M 30 24 L 30 52" marker-end="url(#a)"/>
@@ -445,7 +445,7 @@
 
 <div class="wide">
 <figure style="margin-top:0">
-<div class="ftitle">Figure 3. Internal operation overview — SUBMIT부터 IRQ까지 한 장으로 보기</div>
+<div class="ftitle">Figure 3. Internal operation overview — SUBMIT부터 IRQ까지 한눈에 보기</div>
 <svg viewBox="0 0 1000 612">
   <!-- outer -->
   <rect class="top" x="120" y="18" width="760" height="580" rx="6"/>
@@ -612,7 +612,7 @@
   <tr><td class="c">⑩</td><td>EOT 판단</td><td><code>dma_eot</code>가 ID FIFO에서 1개를 꺼냅니다(→ <code>DESCRIPTOR_ID</code>). 꺼낸 항목의 EOT_IRQ 플래그가 1이면 AND를 통과해 <code>req_eot</code>가 됩니다. → <code>TRANSFER_DONE</code>, <code>IRQ_SOURCE[1]</code>가 섭니다.</td><td><code>resp_out_eot</code>, <code>req_eot</code>, <code>up_eot</code></td></tr>
   <tr><td class="c">⑪</td><td>IRQ</td><td><code>IRQ_PENDING = ~IRQ_MASK &amp; IRQ_SOURCE</code>가 0이 아니면 다음 클럭에 <code>irq = 1</code>. CPU가 <code>IRQ_PENDING</code>에 1을 써서 지우면 내려갑니다.</td><td><code>up_irq_pending</code>, <code>irq</code> (REG)</td></tr>
 </table>
-<div class="info"><p><b>두 줄이 동시에 돈다.</b> ②~③(descriptor 읽기)과 ⑤~⑨(데이터 이동)는 서로 기다리지 않고 동시에 진행됩니다. SAN-005에서는 descriptor 3장을 다 읽은 뒤에야 첫 DEST 쓰기가 나갑니다(10.4절 실측).</p></div>
+<div class="info"><p><b>두 줄이 동시에 돈다.</b> ②~③(descriptor 읽기)과 ⑤~⑨(데이터 이동)는 서로 기다리지 않고 동시에 진행됩니다. SAN-005에서는 descriptor 3개를 다 읽은 뒤에야 첫 DEST 쓰기가 나갑니다(10.4절 실측).</p></div>
 
 <h2 id="sec14">3.3 Functional Block Organization</h2>
 <table>
@@ -638,7 +638,7 @@
   <tr><td><code>ID</code></td><td>0</td><td>PERIPHERAL_ID(0x004) 읽기값. 같은 IP를 여러 개 붙일 때 구분용</td></tr>
   <tr><td><code>ADDR_WIDTH</code></td><td>32</td><td>master 주소 폭. 32보다 크면 <code>*_ADDRESS_HIGH</code> 레지스터가 생김 (현재 0으로 읽힘)</td></tr>
   <tr><td><code>DATA_WIDTH</code></td><td>64</td><td>SRC / DEST 데이터 폭. 1 beat = 8B, <code>AxSIZE = 3</code></td></tr>
-  <tr><td><code>LENGTH_WIDTH</code></td><td>24</td><td>길이 폭. descriptor 1장 최대 16 MiB</td></tr>
+  <tr><td><code>LENGTH_WIDTH</code></td><td>24</td><td>길이 폭. descriptor 1개 최대 16 MiB</td></tr>
   <tr><td><code>MAX_BYTES_PER_BURST</code></td><td>128</td><td>burst 최대 크기. 64bit에서 16 beat (<code>AxLEN ≤ 15</code>)</td></tr>
   <tr><td><code>FIFO_SIZE</code></td><td>8</td><td>버퍼 크기(burst 단위). 8 × 128B = 1KB. burst ID 폭(<code>ID_WIDTH</code>)도 이것으로 정해짐</td></tr>
   <tr><td><code>AXI_ID_WIDTH</code></td><td>1</td><td>master 포트 ID 폭. 값은 항상 0</td></tr>
@@ -775,7 +775,7 @@
   <tr><td>partial 전송 보고</td><td>AXI-Stream 전용. 0x44C / 0x450은 0으로 읽힘</td></tr>
   <tr><td>cyclic, autorun</td><td>FLAGS[0]은 0으로 읽힘</td></tr>
 </table>
-<p><b>동작이 같다는 근거:</b> 정리 전 RTL과 정리 후 RTL을 같은 입력으로 나란히 돌리고, 모든 출력 포트를 매 클럭 비교했습니다. 레지스터 전체 읽기·쓰기, SG / 레지스터 모드 전송, 1바이트 단위 길이, 체인 1~32장, 중간 EOT, IRQ 마스크 4종, 전송 중 ENABLE=0, PAUSE, 비정렬 주소, 메모리 쪽 무작위 지연, 무작위 시퀀스를 넣었고, 약 9만 클럭 동안 차이가 0이었습니다. Sanity 로그도 정리 전과 같습니다.</p>
+<p><b>동작이 같다는 근거:</b> 정리 전 RTL과 정리 후 RTL을 같은 입력으로 나란히 돌리고, 모든 출력 포트를 매 클럭 비교했습니다. 레지스터 전체 읽기·쓰기, SG / 레지스터 모드 전송, 1바이트 단위 길이, 체인 길이 1~32개, 중간 EOT, IRQ 마스크 4종, 전송 중 ENABLE=0, PAUSE, 비정렬 주소, 메모리 쪽 무작위 지연, 무작위 시퀀스를 넣었고, 약 9만 클럭 동안 차이가 0이었습니다. Sanity 로그도 정리 전과 같습니다.</p>
 <p><b>그 전부터 있던 수정 1건:</b> <code>axi_dmac_burst_memory.v</code>의 <code>{DMA_LENGTH_ALIGN{1'b1}}</code>(0번 반복은 Verilog 문법 위반) 수정입니다. 이 구성에서는 값이 0이라, 지금 코드는 <code>dest_burst_len_data = 'h0</code>으로 단순해졌습니다.</p>
 
 <h2 id="sec25">4.5 Register Decode Location</h2>
@@ -912,7 +912,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
 
 <!-- ===================================================================== -->
 <h1 id="sec40">6 Descriptor Format</h1>
-<p>descriptor 1장은 메모리에 이어서 놓인 <b>48바이트(64bit × 6)</b>입니다. <code>dmac_sg</code>는 이것을 AXI 읽기 1번(<code>ARLEN=5</code>, <code>ARSIZE=3</code>, <code>ARBURST=INCR</code>)으로 가져옵니다.</p>
+<p>descriptor 1개는 메모리에 이어서 놓인 <b>48바이트(64bit × 6)</b>입니다. <code>dmac_sg</code>는 이것을 AXI 읽기 1번(<code>ARLEN=5</code>, <code>ARSIZE=3</code>, <code>ARBURST=INCR</code>)으로 가져옵니다.</p>
 
 <h2 id="sec41">6.1 Layout</h2>
 <table>
@@ -937,7 +937,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <tr><td><code>next</code></td><td>다음 descriptor 주소</td><td>하위 32bit만 사용, 하위 3bit 버림</td></tr>
   <tr><td><code>x_length</code></td><td><b>옮길 바이트 수 − 1</b></td><td>하위 24bit만 사용. 0 = 1바이트, <code>0xFF_FFFF</code> = 16 MiB</td></tr>
 </table>
-<p>자주 쓰는 <code>flags</code> 값: 마지막 장 <code>2'b11</code>(LAST + EOT_IRQ), 중간 장 <code>2'b00</code>.</p>
+<p>자주 쓰는 <code>flags</code> 값: 마지막 descriptor <code>2'b11</code>(LAST + EOT_IRQ), 중간 descriptor <code>2'b00</code>.</p>
 
 <h2 id="sec43">6.3 Example (SAN-005 D0)</h2>
 <p>TB <code>write_desc(0x1100, 2'b00, 32'hB0, 0x21000, 0x11000, 0x1140, 128)</code>(570행)이 메모리에 쓰는 값입니다.</p>
@@ -1088,7 +1088,7 @@ assign dma_req_length       = ctrl_hwdesc ? dma_sg_x_length : req_x_length;   //
   <li><b>descriptor FIFO 1단:</b> 엔진이 이전 요청을 받아 가기 전에는 다음 descriptor가 DESC_READY에서 기다립니다.</li>
   <li><b>ID FIFO 최대 4개:</b> 끝나지 않은 descriptor가 4개 쌓이면 splitter가 막혀 fetch가 멈춥니다.</li>
 </ul>
-<p>SAN-005 실측: descriptor AR이 4,215 / 4,295 / 4,375 ns에 나가고, 첫 DEST AW는 4,515 ns입니다. 세 장을 다 읽은 뒤에 첫 쓰기가 나갑니다(10.4절).</p>
+<p>SAN-005 실측: descriptor AR이 4,215 / 4,295 / 4,375 ns에 나가고, 첫 DEST AW는 4,515 ns입니다. descriptor 3개를 다 읽은 뒤에 첫 쓰기가 나갑니다(10.4절).</p>
 
 <!-- ===================================================================== -->
 <h1 id="sec52">8 Data Path and Burst Handling</h1>
@@ -1323,7 +1323,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 <div class="ftitle">SW는 레지스터 세 개만 쓰고, SG 엔진은 LAST까지 반복한다</div>
 <svg viewBox="0 0 680 560">
   <rect class="grp" x="8" y="8" width="330" height="452" rx="6"/><text x="18" y="26" class="s tt">SW와 SG engine (dmac_sg)</text>
-  <rect class="grp" x="352" y="8" width="320" height="544" rx="6"/><text x="362" y="26" class="s tt">Data engine (request_arb) — descriptor 1장마다</text>
+  <rect class="grp" x="352" y="8" width="320" height="544" rx="6"/><text x="362" y="26" class="s tt">Data engine (request_arb) — descriptor 1개마다</text>
   <!-- left lane -->
   <rect class="bw" x="48" y="40" width="250" height="34" rx="17"/><text x="104" y="62" class="s">Start: SW가 descriptor 작성</text>
   <path class="ln" d="M 173 74 L 173 88" marker-end="url(#a)"/>
@@ -1365,7 +1365,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </figure>
 
 <h2 id="sec69">10.3 Step-by-Step with RTL (SAN-005)</h2>
-<p>TB SAN-005(descriptor 3장 gather)에서 각 단계가 어느 코드에서 일어나는지, 그리고 실측 시각을 정리했습니다. D0 @0x1100 (128B), D1 @0x1140 (256B), D2 @0x1180 (64B, flags = 11). 시각은 <code>make sim</code> 실측(ns)입니다.</p>
+<p>TB SAN-005(descriptor 3개 gather)에서 각 단계가 어느 코드에서 일어나는지, 그리고 실측 시각을 정리했습니다. D0 @0x1100 (128B), D1 @0x1140 (256B), D2 @0x1180 (64B, flags = 11). 시각은 <code>make sim</code> 실측(ns)입니다.</p>
 <table>
   <tr><th style="width:11%">단계</th><th>일어나는 일</th><th style="width:28%">파일 : 행</th><th class="c" style="width:9%">실측 (ns)</th></tr>
   <tr><td>1. 설정</td><td>CONTROL 쓰기 → <code>ctrl_hwdesc = 1</code>, <code>ctrl_enable = 1</code></td><td><code>axi_dmac_regmap.v</code> 199~204</td><td class="c">–</td></tr>
@@ -1470,13 +1470,13 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 <path d="M 654.8 20 L 654.8 326" stroke="#b42318" stroke-width="0.8" stroke-dasharray="3 3"/>
 <text x="634.8" y="14" class="xs red">D2 done</text>
 </svg>
-<figcaption>Figure 10. SAN-005 실측 타이밍 (단위 ns, 클럭 10 ns). <code>m_sg_axi</code> 칸은 AR부터 마지막 R까지입니다. DESCRIPTOR_ID는 ID FIFO의 맨 앞 값으로, <code>dma_eot</code>가 나는 클럭에 다음 장의 id로 바뀝니다.</figcaption>
+<figcaption>Figure 10. SAN-005 실측 타이밍 (단위 ns, 클럭 10 ns). <code>m_sg_axi</code> 칸은 AR부터 마지막 R까지입니다. DESCRIPTOR_ID는 ID FIFO의 맨 앞 값으로, <code>dma_eot</code>가 나는 클럭에 다음 descriptor의 id로 바뀝니다.</figcaption>
 </figure>
 <ul>
-  <li>descriptor 3장은 4,435 ns까지 모두 읽혔고, 첫 DEST AW(4,515 ns)보다 앞섭니다(prefetch).</li>
+  <li>descriptor 3개는 4,435 ns까지 모두 읽혔고, 첫 DEST AW(4,515 ns)보다 앞섭니다(prefetch).</li>
   <li><code>dma_eot</code>는 descriptor마다 나지만(4,735 / 5,115 / 5,225 ns), <code>irq</code>는 EOT_IRQ가 켜진 D2 완료 다음 클럭(5,235 ns)에만 올라갑니다.</li>
   <li>마지막 B 응답에서 <code>dma_eot</code>까지 3클럭(30 ns)이 걸립니다(response manager의 단계).</li>
-  <li>체인이 끝난 뒤 DESCRIPTOR_ID는 0xB2로 남습니다. 중간 descriptor가 끝나는 순간에는 이미 다음 장 id로 바뀌어 있습니다.</li>
+  <li>체인이 끝난 뒤 DESCRIPTOR_ID는 0xB2로 남습니다. 중간 descriptor가 끝나는 순간에는 이미 다음 descriptor의 id로 바뀌어 있습니다.</li>
 </ul>
 
 <!-- ===================================================================== -->
@@ -1529,7 +1529,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
 </table>
 
 <h2 id="sec74">11.3 Transfer vs Descriptor</h2>
-<p>레지스터 쪽에서 보면 <b>SUBMIT 1번 = transfer 1개</b>입니다. 체인에 descriptor가 몇 장이든 SOT는 1번입니다.</p>
+<p>레지스터 쪽에서 보면 <b>SUBMIT 1번 = transfer 1개</b>입니다. 체인에 descriptor가 몇 개든 SOT는 1번입니다.</p>
 <ul>
   <li>마지막 descriptor에만 EOT_IRQ를 켜면 SOT 1번, EOT 1번이 되어 TRANSFER_ID와 ACTIVE_TRANSFER_ID가 같이 움직입니다. <b>권장 설정</b>입니다.</li>
   <li>중간 descriptor에도 EOT_IRQ를 켜면 SOT 1번에 EOT가 여러 번 나서 ACTIVE_TRANSFER_ID가 TRANSFER_ID보다 앞서 가고, TRANSFER_DONE 비트와 transfer 번호의 1:1 대응이 깨집니다. 이때는 TRANSFER_DONE으로 체인 완료를 판단하지 말고 인터럽트 횟수를 세거나 메모리를 확인합니다.</li>
@@ -1542,7 +1542,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <li>지우는 방법: IRQ_PENDING을 읽고 같은 값을 다시 씁니다(W1C). 마스크된 비트는 IRQ_SOURCE에 남습니다(SAN-006: IRQ_SOURCE[0] = 1 유지).</li>
   <li>IRQ_MASK 리셋값은 0x3(모두 막힘)입니다. 설정하지 않으면 인터럽트가 나지 않습니다. 마스크를 풀기 전에 IRQ_PENDING에 0x3을 써서 쌓인 이벤트를 비웁니다.</li>
   <li>IRQ_MASK = 0x0이면 출발 직후 SOT(비트0) 알림이 먼저 옵니다. 첫 <code>irq</code>를 완료로 보면 안 됩니다.</li>
-  <li><b>DESCRIPTOR_ID는 ID FIFO의 맨 앞 값입니다.</b> FIFO가 비면 마지막 값이 남아 "마지막으로 끝난 descriptor id"로 읽힙니다. 이것은 구현의 특성이지 약속된 동작이 아닙니다. 중간 descriptor가 끝나는 순간에는 이미 다음 장 id가 보입니다(Figure 10). 완료 판단은 EOT 인터럽트나 TRANSFER_DONE으로 합니다.</li>
+  <li><b>DESCRIPTOR_ID는 ID FIFO의 맨 앞 값입니다.</b> FIFO가 비면 마지막 값이 남아 "마지막으로 끝난 descriptor id"로 읽힙니다. 이것은 구현의 특성이지 약속된 동작이 아닙니다. 중간 descriptor가 끝나는 순간에는 이미 다음 descriptor의 id가 보입니다(Figure 10). 완료 판단은 EOT 인터럽트나 TRANSFER_DONE으로 합니다.</li>
 </ul>
 
 <!-- ===================================================================== -->
@@ -1589,7 +1589,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <li>PAUSE를 풀면(<code>CONTROL ← 0x5</code>) 멈춘 자리부터 이어 갑니다. 단일 descriptor 전송에서는 이렇게 동작함을 확인했습니다.</li>
 </ul>
 <div class="note"><p><b>⚠ 체인을 다 읽기 전에 PAUSE를 걸면 남은 descriptor가 버려집니다.</b> PAUSE도 <code>sg_enable</code>을 0으로 만들고, <code>dmac_sg</code>는 DESC_READY에서 <code>sg_enable = 0</code>이면 IDLE로 돌아갑니다(7.4절 우선순위 1). PAUSE를 풀어도 다음 descriptor를 읽으러 가지 않으므로, <b>이미 엔진에 넘어간 descriptor만 끝나고 체인은 완료되지 않습니다(EOT 없음)</b>.</p>
-<p>512B × 8장 체인으로 확인한 결과, 시작 60~300클럭 뒤에 PAUSE를 걸면 3~7장만 복사되고 끝났고, 420클럭 이후(체인을 모두 읽은 뒤)에 걸면 정상으로 끝났습니다. 정리 전 ADI 코드도 똑같이 동작합니다. 체인 진행 중에는 PAUSE 대신 끝나기를 기다리거나, ENABLE=0으로 끊고 처음부터 다시 시작합니다.</p></div>
+<p>512B × 8개 체인으로 확인한 결과, 시작 60~300클럭 뒤에 PAUSE를 걸면 3~7개만 복사되고 끝났고, 420클럭 이후(체인을 모두 읽은 뒤)에 걸면 정상으로 끝났습니다. 정리 전 ADI 코드도 똑같이 동작합니다. 체인 진행 중에는 PAUSE 대신 끝나기를 기다리거나, ENABLE=0으로 끊고 처음부터 다시 시작합니다.</p></div>
 
 <!-- ===================================================================== -->
 <h1 id="sec80">13 Debug Signal Guide</h1>
@@ -1679,10 +1679,10 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>DMA가 켜져 있나</td><td>CONTROL (0x400), DBG_STATUS[2:0] (0x43C)</td><td>ENABLE = 1, state = 4 (ENABLED)이면 정상</td></tr>
   <tr><td>체인이 시작됐나</td><td>IRQ_SOURCE[0] (0x088), TRANSFER_ID (0x404)</td><td>SOT가 나면 IRQ_SOURCE[0] = 1, TRANSFER_ID +1</td></tr>
   <tr><td>SUBMIT이 아직 대기 중인가</td><td>TRANSFER_SUBMIT (0x408)</td><td>1이면 아직 접수 안 됨 (앞 체인과 예약 1개가 이미 있음)</td></tr>
-  <tr><td>어느 descriptor까지 끝났나</td><td>DESCRIPTOR_ID (0x454)</td><td>ID FIFO 맨 앞 id. 체인 진행 중에는 "지금 처리 중인 장", 끝난 뒤에는 "마지막 장"</td></tr>
+  <tr><td>어느 descriptor까지 끝났나</td><td>DESCRIPTOR_ID (0x454)</td><td>ID FIFO 맨 앞 id. 체인 진행 중에는 "지금 처리 중인 descriptor", 끝난 뒤에는 "마지막 descriptor"</td></tr>
   <tr><td>체인이 끝났나</td><td>IRQ_PENDING[1] / IRQ_SOURCE[1], TRANSFER_DONE (0x428)</td><td>EOT_IRQ가 있는 descriptor가 끝나면 1</td></tr>
   <tr><td>지금 어디를 읽고 쓰나</td><td>CURRENT_SRC_ADDRESS (0x438), CURRENT_DEST_ADDRESS (0x434)</td><td>현재 AXI 버스의 <code>araddr</code> / <code>awaddr</code> (관찰용)</td></tr>
-  <tr><td>얼마나 옮겼나</td><td>TRANSFER_PROGRESS (0x448)</td><td>DEST까지 끝난 바이트 수 누적. EOT 다음 클럭에 0. EOT_IRQ가 없는 장은 지우지 않고 계속 쌓음</td></tr>
+  <tr><td>얼마나 옮겼나</td><td>TRANSFER_PROGRESS (0x448)</td><td>DEST까지 끝난 바이트 수 누적. EOT 다음 클럭에 0. EOT_IRQ가 없는 descriptor는 지우지 않고 계속 쌓음</td></tr>
   <tr><td>burst가 어디서 멈췄나</td><td>DBG_IDS0 / DBG_IDS1 (0x440 / 0x444)</td><td>같은 쪽 4개 ID 중 값이 다른 단계가 진행 중 (9.6)</td></tr>
   <tr><td>각 블록 상태</td><td>DBG_STATUS (0x43C)</td><td>enable 비트, reset manager 상태 (9.5)</td></tr>
 </table>
@@ -1722,7 +1722,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><td>descriptor가 4KB 경계를 걸침</td><td>경계 검사 없음</td><td><code>m_sg_axi</code> burst가 4KB를 넘음 (AXI 규칙 위반)</td><td><code>araddr</code> + 48 &gt; 4KB 경계</td><td>T-13</td></tr>
   <tr><td>체인 진행 중 SUBMIT</td><td>주소 FIFO 1단에 1개 예약. 그 이상은 대기</td><td>앞 체인이 끝난 뒤 시작. 두 번째 예약은 TRANSFER_SUBMIT = 1로 대기</td><td>TRANSFER_SUBMIT 읽기</td><td>T-10</td></tr>
   <tr><td>진행 중 ENABLE = 0</td><td>reset manager가 SHUTDOWN → 리셋</td><td>진행 중인 AXI는 마무리, 남은 체인은 버림</td><td>DBG_STATUS[2:0] 5 → 2 → 0 → 1</td><td>T-11</td></tr>
-  <tr><td><b>체인을 다 읽기 전 PAUSE</b></td><td>DESC_READY에서 <code>sg_enable = 0</code> → IDLE</td><td><b>PAUSE를 풀어도 남은 descriptor를 읽지 않음. EOT 없음</b> (12.3)</td><td>엔진에 넘어간 장 수 &lt; 체인 장 수, <code>hwdesc_state = 0</code></td><td>T-12</td></tr>
+  <tr><td><b>체인을 다 읽기 전 PAUSE</b></td><td>DESC_READY에서 <code>sg_enable = 0</code> → IDLE</td><td><b>PAUSE를 풀어도 남은 descriptor를 읽지 않음. EOT 없음</b> (12.3)</td><td>엔진에 넘어간 descriptor 수 &lt; 체인의 descriptor 수, <code>hwdesc_state = 0</code></td><td>T-12</td></tr>
   <tr><td>HWDESC = 1, 완료 전 DESCRIPTOR_ID 읽기</td><td>ID FIFO 출력 레지스터에 리셋 없음</td><td>값이 정해져 있지 않음 (시뮬레이션 X)</td><td>DESCRIPTOR_ID 읽기</td><td>T-08</td></tr>
 </table>
 
@@ -1788,7 +1788,7 @@ x_length[6:0]  = 마지막 burst 바이트 수 − 1 → i_src_req_fifo → src 
   <tr><th style="width:24%">항목</th><th>내용</th><th style="width:15%">관련</th></tr>
   <tr><td><b>체인 도중 PAUSE</b></td><td>체인을 다 읽기 전에 PAUSE를 걸면 남은 descriptor를 버리고 EOT가 나지 않음 (확인됨). 의도된 동작인지, 드라이버 제약으로 둘지, RTL을 고칠지 결정 필요</td><td>12.3, 15.1, T-12</td></tr>
   <tr><td>중간 descriptor EOT_IRQ</td><td>SOT 1번에 EOT 여러 번일 때 TRANSFER_DONE / ACTIVE_TRANSFER_ID 해석</td><td>11.3, T-08</td></tr>
-  <tr><td>TRANSFER_PROGRESS</td><td>SG 체인에서 EOT_IRQ가 없는 장을 넘어 누적되는 동작 측정</td><td>14.1, T-12</td></tr>
+  <tr><td>TRANSFER_PROGRESS</td><td>SG 체인에서 EOT_IRQ가 없는 descriptor를 넘어 누적되는 동작 측정</td><td>14.1, T-12</td></tr>
   <tr><td>AXI 에러 주입</td><td>SG / SRC / DEST 각각 SLVERR / DECERR 주입 시 hang 여부와 결과 데이터</td><td>15.1, T-15</td></tr>
   <tr><td>길이 경계</td><td>1B, 8의 배수가 아닌 길이, 128B 경계 앞뒤, 16 MiB</td><td>8.2, 6.4, T-07</td></tr>
   <tr><td>4KB 경계</td><td>0x0FF0에 descriptor 배치, 128B 정렬이 아닌 데이터 주소</td><td>6.4, T-13</td></tr>
