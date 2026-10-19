@@ -1,0 +1,178 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 612">
+<style>
+  svg text { font-family: "Malgun Gothic", sans-serif; fill: #1f2a37; }
+  svg .m { font-family: Consolas, monospace; }
+  svg .tt { font-weight: 700; }
+  svg .s { font-size: 10px; } svg .xs { font-size: 9px; } svg .md { font-size: 11px; } svg .lg { font-size: 12.5px; }
+  svg .mu { fill: #5b6573; }
+  svg .sgc { fill: #2f5fa7; } svg .dpc { fill: #b85a22; } svg .red { fill: #b42318; }
+  svg .ln { stroke: #3f4a56; stroke-width: 1.3; fill: none; }
+  svg .lnd { stroke: #8a94a3; stroke-width: 1.1; fill: none; stroke-dasharray: 4 3; }
+  svg .lns { stroke: #2f5fa7; stroke-width: 1.5; fill: none; }
+  svg .lno { stroke: #b85a22; stroke-width: 1.5; fill: none; }
+  svg .lnr { stroke: #b42318; stroke-width: 1.5; fill: none; }
+  svg .bct { fill: #f3f4f6; stroke: #5f6b7a; stroke-width: 1.2; }
+  svg .bsg { fill: #e7eefa; stroke: #2f5fa7; stroke-width: 1.4; }
+  svg .bdp { fill: #fcf0e6; stroke: #b85a22; stroke-width: 1.4; }
+  svg .bw  { fill: #ffffff; stroke: #5f6b7a; stroke-width: 1.2; }
+  svg .bext { fill: #ffffff; stroke: #9aa3ae; stroke-width: 1.1; stroke-dasharray: 5 3; }
+  svg .grp { fill: none; stroke: #9aa3ae; stroke-width: 1.1; stroke-dasharray: 6 4; }
+  svg .grpsg { fill: #f6f9fe; stroke: #2f5fa7; stroke-width: 1.1; stroke-dasharray: 6 4; }
+  svg .grpdp { fill: #fffaf5; stroke: #b85a22; stroke-width: 1.1; stroke-dasharray: 6 4; }
+  svg .top { fill: #fbfbfc; stroke: #1f2a37; stroke-width: 1.8; }
+  svg .num { fill: #1f2a37; } svg .numt { fill: #fff; font-size: 10px; font-weight: 700; }
+svg { background: #ffffff; }
+</style>
+<defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#3f4a56"/></marker>
+    <marker id="as" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#2f5fa7"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#b85a22"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#b42318"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#8a94a3"/></marker>
+  </defs>
+  <!-- outer -->
+  <rect class="top" x="120" y="18" width="760" height="580" rx="6"/>
+  <text x="128" y="34" class="md tt m">sg_dma_top</text>
+  <!-- external -->
+  <rect class="bext" x="8" y="62" width="92" height="44" rx="3"/><text x="18" y="80" class="s tt">CPU</text><text x="18" y="96" class="xs mu">AXI4-Lite master</text>
+  <rect class="bext" x="8" y="268" width="100" height="48" rx="3"/><text x="18" y="287" class="s tt">Descriptor</text><text x="18" y="303" class="s tt">메모리</text>
+  <rect class="bext" x="8" y="522" width="100" height="48" rx="3"/><text x="18" y="541" class="s tt">Source</text><text x="18" y="557" class="s tt">메모리</text>
+  <rect class="bext" x="892" y="522" width="100" height="48" rx="3"/><text x="902" y="541" class="s tt">Destination</text><text x="902" y="557" class="s tt">메모리</text>
+  <rect class="bext" x="892" y="20" width="100" height="30" rx="3"/><text x="902" y="40" class="s tt">CPU 인터럽트</text>
+  <text x="10" y="594" class="xs m">clk, resetn</text><path class="ln" d="M 74 590 L 118 590" marker-end="url(#a)"/>
+
+  <!-- ===== control row ===== -->
+  <path class="ln" d="M 100 84 L 138 84" marker-end="url(#a)" marker-start="url(#a)"/><text x="103" y="78" class="xs m">s_axi</text>
+  <rect class="bct" x="140" y="58" width="112" height="66" rx="3"/>
+  <text x="150" y="78" class="md tt m">up_axi</text><text x="150" y="95" class="xs mu">AXI4-Lite →</text><text x="150" y="109" class="xs mu">레지스터 버스</text>
+  <rect class="bct" x="270" y="58" width="200" height="66" rx="3"/>
+  <text x="280" y="78" class="md tt m">axi_dmac_regmap</text>
+  <text x="280" y="95" class="xs">CONTROL (ENABLE · PAUSE · HWDESC)</text>
+  <text x="280" y="110" class="xs">IRQ_MASK · SOURCE · PENDING → irq</text>
+  <rect class="bct" x="490" y="58" width="370" height="66" rx="3"/>
+  <text x="500" y="78" class="md tt m">axi_dmac_regmap_request</text>
+  <text x="500" y="95" class="xs">SG_ADDRESS · TRANSFER_SUBMIT · (레지스터 모드) DEST/SRC_ADDRESS · X_LENGTH</text>
+  <text x="500" y="110" class="xs">TRANSFER_ID · TRANSFER_DONE · DESCRIPTOR_ID · TRANSFER_PROGRESS</text>
+  <path class="ln" d="M 252 91 L 268 91" marker-end="url(#a)"/>
+  <path class="ln" d="M 470 91 L 488 91" marker-end="url(#a)"/>
+  <!-- irq -->
+  <path class="lnr" d="M 370 58 L 370 35 L 890 35" marker-end="url(#ar)"/>
+  <text x="380" y="30" class="xs red">irq (level) — IRQ_PENDING ≠ 0 이면 1</text>
+
+  <!-- ===== reset manager ===== -->
+  <rect class="bct" x="140" y="150" width="175" height="74" rx="3"/>
+  <text x="150" y="168" class="s tt m">axi_dmac_reset_manager</text>
+  <text x="150" y="185" class="xs">ENABLE · PAUSE 순서 제어</text>
+  <text x="150" y="200" class="xs mu">→ 모든 블록 enable</text>
+  <text x="150" y="214" class="xs mu">→ dma_resetn (내부 리셋)</text>
+  <path class="ln" d="M 300 124 L 300 148" marker-end="url(#a)"/><text x="306" y="141" class="xs m mu">ctrl_*</text>
+  <path class="lnd" d="M 315 190 L 353 190" marker-end="url(#ag)"/>
+
+  <!-- ===== SG engine ===== -->
+  <rect class="grpsg" x="335" y="140" width="400" height="222" rx="5"/>
+  <text x="344" y="356" class="xs sgc m">i_dmac_sg (dmac_sg.v)</text>
+  <rect class="bsg" x="355" y="158" width="178" height="182" rx="3"/>
+  <text x="365" y="176" class="md tt">Descriptor FSM</text>
+  <text x="365" y="194" class="xs m">IDLE → SEND_ADDR</text>
+  <text x="365" y="208" class="xs m">→ RECV_DESC → DESC_READY</text>
+  <path d="M 362 218 L 526 218" stroke="#9db5dc" stroke-width="1"/>
+  <text x="365" y="236" class="s tt">필드 레지스터</text>
+  <text x="365" y="253" class="xs m">dest_addr · src_addr</text>
+  <text x="365" y="268" class="xs m">x_length · next_desc_addr</text>
+  <text x="365" y="283" class="xs m">hwdesc_id · hwdesc_flags</text>
+  <text x="365" y="305" class="xs mu">R beat 0~5를 순서대로</text>
+  <text x="365" y="319" class="xs mu">각 레지스터에 저장</text>
+  <!-- m_sg -->
+  <path class="lns" d="M 108 284 L 353 284" marker-end="url(#as)"/><text x="128" y="279" class="xs m sgc">m_sg_axi AR (ARLEN=5, 48 B)</text>
+  <path class="lns" d="M 353 302 L 108 302" marker-end="url(#as)"/><text x="128" y="315" class="xs m sgc">m_sg_axi R × 6 beat</text>
+  <!-- addr fifo -->
+  <rect class="bsg" x="552" y="158" width="112" height="42" rx="3"/>
+  <text x="560" y="175" class="xs tt m">i_sg_addr_fifo</text><text x="560" y="190" class="xs mu">첫 descriptor 주소</text>
+  <path class="lns" d="M 608 124 L 608 156" marker-end="url(#as)"/><text x="616" y="134" class="xs sgc">SG_ADDRESS + SUBMIT</text>
+  <path class="lns" d="M 552 179 L 535 179" marker-end="url(#as)"/>
+  <!-- splitter -->
+  <rect class="bsg" x="552" y="218" width="112" height="32" rx="3"/>
+  <text x="560" y="238" class="xs tt m">i_req_splitter</text>
+  <path class="lns" d="M 533 234 L 550 234" marker-end="url(#as)"/>
+  <!-- desc fifo -->
+  <rect class="bsg" x="552" y="270" width="112" height="44" rx="3"/>
+  <text x="560" y="287" class="xs tt m">i_sg_desc_fifo</text><text x="560" y="302" class="xs mu">dest · src · x_length</text>
+  <path class="lns" d="M 608 250 L 608 268" marker-end="url(#as)"/>
+  <!-- id fifo -->
+  <rect class="bsg" x="676" y="218" width="54" height="64" rx="3"/>
+  <text x="682" y="236" class="xs tt m">i_fifo</text><text x="682" y="250" class="xs mu">id + eot</text><text x="682" y="264" class="xs mu">최대 4개</text>
+  <path class="lns" d="M 664 234 L 674 234" marker-end="url(#as)"/>
+
+  <!-- AND gate -->
+  <path class="bw" d="M 752 222 L 770 222 A 18 18 0 0 1 770 258 L 752 258 z"/>
+  <text x="760" y="245" class="md tt">&amp;</text>
+  <path class="lns" d="M 730 240 L 750 240" marker-end="url(#as)"/>
+  <text x="732" y="272" class="xs sgc">eot flag</text>
+  <path class="lnr" d="M 788 240 L 800 240 L 800 126" marker-end="url(#ar)"/>
+  <text x="806" y="190" class="xs red m">req_eot</text>
+  <path class="lns" d="M 703 218 L 703 126" marker-end="url(#as)"/>
+  <text x="708" y="150" class="xs sgc">id</text>
+
+  <!-- MUX -->
+  <path class="bw" d="M 540 386 L 690 386 L 676 428 L 554 428 z"/>
+  <text x="572" y="404" class="s tt">Request MUX</text><text x="574" y="419" class="xs m mu">ctrl_hwdesc ? SG : REG</text>
+  <path class="lns" d="M 608 314 L 608 384" marker-end="url(#as)"/><text x="614" y="352" class="xs sgc">SG 요청</text>
+  <path class="ln" d="M 850 124 L 850 406 L 783 406 A 7 7 0 0 0 769 406 L 690 406" marker-end="url(#a)"/>
+  <text x="856" y="262" class="xs">REG 요청</text><text x="856" y="274" class="xs mu">(HWDESC=0)</text>
+
+  <!-- ===== data engine ===== -->
+  <rect class="grpdp" x="135" y="442" width="730" height="150" rx="5"/>
+  <text x="640" y="586" class="xs dpc m">i_request_arb (request_arb.v) — data mover</text>
+  <path class="ln" d="M 612 428 L 612 476 L 284 476" marker-end="url(#a)"/>
+  <text x="400" y="470" class="xs">요청: 주소 · 길이 (x_length)</text>
+  <!-- req gen -->
+  <rect class="bdp" x="150" y="456" width="132" height="42" rx="3"/>
+  <text x="158" y="473" class="xs tt m">i_req_gen</text><text x="158" y="488" class="xs mu">burst로 나누기 · burst ID</text>
+  <!-- src -->
+  <rect class="bdp" x="160" y="516" width="130" height="62" rx="3"/>
+  <text x="168" y="533" class="xs tt m">i_src_dma_mm</text><text x="168" y="548" class="xs">AR 발행 · R 수신</text><text x="168" y="563" class="xs mu">burst 하나 = AR 하나</text>
+  <path class="ln" d="M 216 498 L 216 514" marker-end="url(#a)"/>
+  <path class="lno" d="M 160 538 L 108 538" marker-end="url(#ao)"/><text x="116" y="533" class="xs m dpc">AR</text>
+  <path class="lno" d="M 108 560 L 158 560" marker-end="url(#ao)"/><text x="116" y="574" class="xs m dpc">R</text>
+  <!-- burst memory -->
+  <rect class="bdp" x="330" y="508" width="250" height="78" rx="3"/>
+  <text x="340" y="524" class="xs tt m">i_store_and_forward</text><text x="450" y="524" class="xs mu">(burst memory)</text>
+  <g>
+    <rect x="345" y="532" width="24" height="24" fill="#fff" stroke="#b85a22"/><rect x="373" y="532" width="24" height="24" fill="#f6c9a6" stroke="#b85a22"/>
+    <rect x="401" y="532" width="24" height="24" fill="#f6c9a6" stroke="#b85a22"/><rect x="429" y="532" width="24" height="24" fill="#fff" stroke="#b85a22"/>
+    <rect x="457" y="532" width="24" height="24" fill="#fff" stroke="#b85a22"/><rect x="485" y="532" width="24" height="24" fill="#fff" stroke="#b85a22"/>
+    <rect x="513" y="532" width="24" height="24" fill="#fff" stroke="#b85a22"/><rect x="541" y="532" width="24" height="24" fill="#fff" stroke="#b85a22"/>
+  </g>
+  <text x="345" y="575" class="xs mu">8칸 × 128 B = 1 KB · burst가 다 차면 DEST로</text>
+  <path class="lno" d="M 290 548 L 328 548" marker-end="url(#ao)"/>
+  <!-- dest -->
+  <rect class="bdp" x="620" y="516" width="140" height="62" rx="3"/>
+  <text x="628" y="533" class="xs tt m">i_dest_dma_mm</text><text x="628" y="548" class="xs">AW · W 발행, B 수신</text><text x="628" y="563" class="xs mu">마지막 beat는 WSTRB</text>
+  <path class="lno" d="M 580 548 L 618 548" marker-end="url(#ao)"/>
+  <path class="lno" d="M 760 538 L 890 538" marker-end="url(#ao)"/><text x="800" y="533" class="xs m dpc">AW, W</text>
+  <path class="lno" d="M 890 560 L 762 560" marker-end="url(#ao)"/><text x="800" y="574" class="xs m dpc">B</text>
+  <!-- response manager -->
+  <rect class="bdp" x="700" y="452" width="150" height="46" rx="3"/>
+  <text x="708" y="469" class="xs tt m">i_response_manager</text><text x="708" y="484" class="xs mu">B 응답 모음 · 마지막 → eot</text>
+  <path class="lno" d="M 740 516 L 740 500" marker-end="url(#ao)"/>
+  <!-- dma_eot up -->
+  <path class="lnr" d="M 769 452 L 769 260" marker-end="url(#ar)"/>
+  <text x="775" y="436" class="xs red m">dma_eot</text>
+  <circle cx="769" cy="300" r="3" fill="#b42318"/>
+  <path class="lnr" d="M 769 300 L 718 300 L 718 284" marker-end="url(#ar)"/><text x="722" y="314" class="xs red">pop</text>
+
+  <!-- ===== numbers ===== -->
+  <g>
+    <circle class="num" cx="596" cy="132" r="8"/><text x="592.5" y="135.5" class="numt">1</text>
+    <circle class="num" cx="312" cy="293" r="8"/><text x="308.5" y="296.5" class="numt">2</text>
+    <circle class="num" cx="540" cy="212" r="8"/><text x="536.5" y="215.5" class="numt">3</text>
+    <circle class="num" cx="530" cy="407" r="8"/><text x="526.5" y="410.5" class="numt">4</text>
+    <circle class="num" cx="150" cy="456" r="8"/><text x="146.5" y="459.5" class="numt">5</text>
+    <circle class="num" cx="160" cy="516" r="8"/><text x="156.5" y="519.5" class="numt">6</text>
+    <circle class="num" cx="330" cy="508" r="8"/><text x="326.5" y="511.5" class="numt">7</text>
+    <circle class="num" cx="760" cy="516" r="8"/><text x="756.5" y="519.5" class="numt">8</text>
+    <circle class="num" cx="850" cy="452" r="8"/><text x="846.5" y="455.5" class="numt">9</text>
+    <circle class="num" cx="787" cy="214" r="8"/><text x="780" y="217.5" class="numt">10</text>
+    <circle class="num" cx="370" cy="47" r="8"/><text x="363" y="50.5" class="numt">11</text>
+  </g>
+</svg>

@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>SGDMA-SANITY-rel-v2.0.0</title>
+<style>
+  @page { size: A4; margin: 17mm 17mm 16mm 17mm; }
+  @page wide { size: A4 landscape; margin: 12mm 14mm 14mm 14mm; }
+  :root {
+    --ink: #1f2a37; --muted: #5b6573; --line: #cfd5dd; --head: #eef1f5;
+    --sg: #2f5fa7; --sgf: #e7eefa; --dp: #b85a22; --dpf: #fcf0e6;
+    --ct: #5f6b7a; --ctf: #f3f4f6; --warn: #fff7e6; --warnb: #e0a43a;
+  }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Malgun Gothic", sans-serif; font-size: 9.6pt; line-height: 1.6; color: var(--ink); margin: 0; }
+  code, .mono { font-family: Consolas, "Malgun Gothic", monospace; font-size: 0.92em; }
+  p code, li code, td code { background: #f2f4f7; border-radius: 2px; padding: 0 2px; }
+  h1, h2, h3, h4 { font-weight: 700; line-height: 1.35; break-after: avoid; }
+  h1 { font-size: 17pt; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--ink); break-before: page; }
+  h2 { font-size: 12.5pt; margin: 20px 0 6px; }
+  h3 { font-size: 10.6pt; margin: 14px 0 4px; }
+  h4 { font-size: 9.8pt; margin: 10px 0 2px; }
+  p { margin: 4px 0 8px; }
+  ul, ol { margin: 4px 0 8px; padding-left: 20px; }
+  li { margin: 1px 0; }
+  ul.chk { list-style: none; padding-left: 6px; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 8.8pt; line-height: 1.45; }
+  th, td { border: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
+  th { background: var(--head); font-weight: 700; }
+  tr { break-inside: avoid; }
+  td.c, th.c { text-align: center; }
+  .note { background: var(--warn); border-left: 3px solid var(--warnb); padding: 6px 10px; margin: 8px 0 12px; break-inside: avoid; }
+  .info { background: #eef4fb; border-left: 3px solid var(--sg); padding: 6px 10px; margin: 8px 0 12px; break-inside: avoid; }
+  .note p, .info p { margin: 2px 0; }
+  figure { margin: 10px 0 14px; break-inside: avoid; }
+  figure .ftitle { font-weight: 700; font-size: 9.4pt; margin-bottom: 4px; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font-size: 8.4pt; color: var(--muted); margin-top: 4px; }
+  pre { font-family: Consolas, monospace; font-size: 8.4pt; line-height: 1.45; background: #f6f7f9; border: 1px solid #e3e6ea; padding: 7px 10px; margin: 6px 0 10px; white-space: pre-wrap; break-inside: avoid; }
+  .wide { page: wide; break-before: page; }
+  .wide h2 { margin-top: 0; }
+  .avoid { break-inside: avoid; }
+  .pb { break-before: page; }
+  .small { font-size: 8.4pt; color: var(--muted); }
+  .tag { display: inline-block; font-size: 7.6pt; padding: 0 5px; border-radius: 3px; border: 1px solid; margin-right: 2px; }
+  .tag.sg { color: var(--sg); border-color: var(--sg); background: var(--sgf); }
+  .tag.dp { color: var(--dp); border-color: var(--dp); background: var(--dpf); }
+  .tag.ct { color: var(--ct); border-color: var(--ct); background: var(--ctf); }
+  /* cover */
+  .cover { height: 245mm; display: flex; flex-direction: column; }
+  .cover .t1 { font-size: 26pt; font-weight: 700; margin-top: 60mm; }
+  .cover .t2 { font-size: 13pt; color: var(--muted); margin-top: 4px; }
+  .cover table { width: 60%; margin-top: 30mm; font-size: 9.2pt; }
+  .cover table th { width: 32%; }
+  .tochead { break-before: page; font-size: 16pt; border-bottom: 2px solid #1f2937; padding-bottom: 4px; margin-bottom: 10px; }
+  .toc { font-size: 10pt; line-height: 1.75; }
+  .toc a { display: block; color: #111827; text-decoration: none; break-inside: avoid; }
+  .toc .t1 { font-weight: 700; margin-top: 7px; }
+  .toc .t2 { padding-left: 22px; }
+  .toc .t3 { padding-left: 44px; color: #374151; font-size: 9.5pt; }
+  /* svg text */
+  svg text { font-family: "Malgun Gothic", sans-serif; fill: #1f2a37; }
+  svg .m { font-family: Consolas, monospace; }
+  svg .tt { font-weight: 700; }
+  svg .s { font-size: 10px; } svg .xs { font-size: 9px; } svg .md { font-size: 11px; } svg .lg { font-size: 12.5px; }
+  svg .mu { fill: #5b6573; }
+  svg .sgc { fill: #2f5fa7; } svg .dpc { fill: #b85a22; } svg .red { fill: #b42318; }
+  svg .ln { stroke: #3f4a56; stroke-width: 1.3; fill: none; }
+  svg .lnd { stroke: #8a94a3; stroke-width: 1.1; fill: none; stroke-dasharray: 4 3; }
+  svg .lns { stroke: #2f5fa7; stroke-width: 1.5; fill: none; }
+  svg .lno { stroke: #b85a22; stroke-width: 1.5; fill: none; }
+  svg .lnr { stroke: #b42318; stroke-width: 1.5; fill: none; }
+  svg .bct { fill: #f3f4f6; stroke: #5f6b7a; stroke-width: 1.2; }
+  svg .bsg { fill: #e7eefa; stroke: #2f5fa7; stroke-width: 1.4; }
+  svg .bdp { fill: #fcf0e6; stroke: #b85a22; stroke-width: 1.4; }
+  svg .bw  { fill: #ffffff; stroke: #5f6b7a; stroke-width: 1.2; }
+  svg .bext { fill: #ffffff; stroke: #9aa3ae; stroke-width: 1.1; stroke-dasharray: 5 3; }
+  svg .grp { fill: none; stroke: #9aa3ae; stroke-width: 1.1; stroke-dasharray: 6 4; }
+  svg .grpsg { fill: #f6f9fe; stroke: #2f5fa7; stroke-width: 1.1; stroke-dasharray: 6 4; }
+  svg .grpdp { fill: #fffaf5; stroke: #b85a22; stroke-width: 1.1; stroke-dasharray: 6 4; }
+  svg .top { fill: #fbfbfc; stroke: #1f2a37; stroke-width: 1.8; }
+  svg .num { fill: #1f2a37; } svg .numt { fill: #fff; font-size: 10px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- shared arrow markers -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#3f4a56"/></marker>
+    <marker id="as" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#2f5fa7"/></marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#b85a22"/></marker>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#b42318"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="#8a94a3"/></marker>
+  </defs>
+</svg>
+
+<section class="cover">
+  <div class="t1">SG DMA<br>Sanity Test</div>
+  <div class="t2">회귀 게이트 · TC 7개 / 체크 46개 · tb_sg_dma</div>
+  <table>
+    <tr><th>문서 ID</th><td>SGDMA-SANITY-rel-v2.0.0</td></tr>
+    <tr><th>날짜</th><td>2026-10-19</td></tr>
+    <tr><th>작성자</th><td>조혜린 (hrcho)</td></tr>
+    <tr><th>대상 DUT</th><td><code>rtl/sg_dma_top.v</code> (module <code>sg_dma_top</code>)</td></tr>
+    <tr><th>구현</th><td><code>tb/tb_sg_dma.sv</code>, <code>tb/axi_mem_slave.sv</code>, <code>tb/tb_mem_pkg.sv</code></td></tr>
+    <tr><th>구성</th><td>TC 7개 / 체크 46개</td></tr>
+    <tr><th>최종 실행</th><td>2026-10-19 — 46/46 PASS (6,305 ns, Vivado xsim 2024.2)</td></tr>
+    <tr><th>이전 판</th><td>SGDMA-SANITY-rel-v1.1.0 (2026-10-16, 정리 전 RTL 기준)</td></tr>
+  </table>
+</section>
+
+<h1>문서 안내</h1>
+<h2>관련 문서</h2>
+<table>
+  <tr><th style="width:36%">문서</th><th>역할</th></tr>
+  <tr><td><code>SGDMA-SFR-rel-v2.0.0</code></td><td>레지스터 사양. 이 문서의 모든 기대값 근거. SFR 절 번호(예: §4.1.1)는 이 판 기준</td></tr>
+  <tr><td><code>SGDMA-SOR-rel-v2.0.0</code></td><td>검증 요구사항 — 테스트 15개(T-01 ~ T-15). 이 문서의 SOR 연결은 이 판 기준</td></tr>
+  <tr><td><code>SG_DMA_Architecture_Specification</code> (SGDMA-ARCH-rel-v2.0.0)</td><td>구조, 데이터 경로, SAN-005 실측 타이밍</td></tr>
+</table>
+<div class="note"><p><b>46/46 PASS는 이 46개 체크가 통과했다는 뜻입니다.</b> 레지스터와 DMA 기능 전체가 검증되었다는 뜻이 아닙니다. 예를 들어 SAN-003은 리셋값 10개만 봅니다. Sanity가 보지 않는 항목과 그것을 맡은 SOR 테스트는 5장에 정리했습니다.</p></div>
+
+<h2>용어</h2>
+<table>
+  <tr><th style="width:20%">용어</th><th>정의</th></tr>
+  <tr><td>TC / 체크</td><td>Sanity 테스트 케이스(SAN-001 ~ SAN-007) / TC 안의 비교 1회. 모두 46개</td></tr>
+  <tr><td>회귀 게이트</td><td>RTL을 고칠 때마다 실행해 다음 단계 진행 여부를 판정하는 자동 테스트</td></tr>
+  <tr><td>SKIP</td><td>TC를 실행하지 않고 건너뜀 (2.3)</td></tr>
+  <tr><td>watchdog</td><td>정해진 시뮬레이션 시간이 지나면 <code>$fatal</code>로 종료하는 감시 블록</td></tr>
+  <tr><td>guard (tail)</td><td>목적지 끝 바로 뒤 16바이트. 쓰이면 범위 초과 쓰기</td></tr>
+  <tr><td>gather / scatter</td><td>여러 소스 → 연속 목적지 / 연속 소스 → 여러 목적지. Sanity는 gather만 봄</td></tr>
+  <tr><td>구현 특성 체크</td><td>ADI가 문서로 보장하지 않은, 현재 RTL의 동작을 확인하는 체크. 이 문서에서는 <code>DESCRIPTOR_ID</code> 완료 후 값 2개 (3.8)</td></tr>
+  <tr><td>근거 등급 M / P / R</td><td>SFR §2.5. M = Sanity 측정, P = 일회성 측정, R = RTL 분석</td></tr>
+  <tr><td>SOT / EOT</td><td><code>IRQ_SOURCE</code> 비트0(요청 수락) / 비트1(전송 완료)</td></tr>
+</table>
+
+<h2>v1.1.0 대비 바뀐 점</h2>
+<p><b>체크 46개, TC별 체크 수, 실행 순서, 기대값, 판정 규칙은 바뀌지 않았습니다.</b> RTL 정리(2026-10-17) 후에도 로그의 체크 결과와 AXI 트랜잭션 시각이 정리 전과 같습니다.</p>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th>바뀐 점</th><th style="width:16%">위치</th></tr>
+  <tr><td class="c">1</td><td>대상과 경로: <code>rtl/sg_dma/sgdma_top.v</code> → <code>rtl/sg_dma_top.v</code>, <code>tb/sg_dma/tb_sg_dma.sv</code> → <code>tb/tb_sg_dma.sv</code>, <code>tb/common/*</code> → <code>tb/*</code>. RTL은 <code>rtl/</code> 18개 파일</td><td>머리말, 4장, 6장</td></tr>
+  <tr><td class="c">2</td><td><code>tb_sg_dma.sv</code>의 주석과 배너만 고쳤습니다(문서 판 번호, 0x450·AXCACHE 설명, 미구현 기능 표기). 체크 로직·기대값·체크 이름은 같습니다. 2026-10-19 다시 실행해 46/46을 확인했습니다</td><td>부록 A, 부록 C</td></tr>
+  <tr><td class="c">3</td><td><code>0x450</code>은 정리 후 미구현(읽기 0, 부작용 없음)이므로 "읽기 금지" 규칙을 해제했습니다. SAN-007은 TB를 바꾸지 않아 여전히 읽지 않습니다</td><td>3.4, 5.5</td></tr>
+  <tr><td class="c">4</td><td>SAN-003이 보지 않는 리셋값을 SFR v2.0.0이 일회성으로 측정했습니다(P). Sanity 범위는 그대로입니다</td><td>5.2</td></tr>
+  <tr><td class="c">5</td><td>파라미터 변경 시 고칠 기대값을 <code>sg_dma_top</code>의 9개 파라미터 기준으로 다시 정리했습니다. 2D·framelock·cyclic은 파라미터가 아니라 RTL에서 제거된 기능입니다</td><td>7.1</td></tr>
+  <tr><td class="c">6</td><td>메모리 모델의 제약(outstanding 1개, 항상 OKAY, 지연 없음)을 명시했습니다</td><td>6.4</td></tr>
+  <tr><td class="c">7</td><td>비유 표현을 빼고 용어를 그대로 썼습니다. descriptor 수는 "개"로 셉니다</td><td>전체</td></tr>
+</table>
+
+<h2 class="tochead">목차 (Table of Contents)</h2>
+<div class="toc">
+  <a class="t1" href="#sec1">1 개요</a>
+  <a class="t2" href="#sec2">1.1 Sanity의 역할</a>
+  <a class="t2" href="#sec3">1.2 Sanity가 하지 않는 것</a>
+  <a class="t2" href="#sec4">1.3 SOR과의 관계</a>
+  <a class="t1" href="#sec5">2 구성</a>
+  <a class="t2" href="#sec6">2.1 TC 목록</a>
+  <a class="t2" href="#sec7">2.2 실행 순서</a>
+  <a class="t2" href="#sec8">2.3 판정 규칙</a>
+  <a class="t1" href="#sec9">3 TC 상세</a>
+  <a class="t2" href="#sec10">3.1 SAN-001 Register identity (5 checks)</a>
+  <a class="t2" href="#sec11">3.2 SAN-002 Scratch R/W (3 checks)</a>
+  <a class="t2" href="#sec12">3.3 SAN-003 Reset defaults (10 checks)</a>
+  <a class="t2" href="#sec13">3.4 SAN-007 Parameter-masked bits (11 checks)</a>
+  <a class="t2" href="#sec14">3.5 SAN-004 Single descriptor copy (4 checks)</a>
+  <a class="t2" href="#sec15">3.6 SAN-005 3-descriptor chain, gather (6 checks)</a>
+  <a class="t2" href="#sec16">3.7 SAN-006 IRQ &amp; status (7 checks)</a>
+  <a class="t2" href="#sec17">3.8 구현 특성 체크 — DESCRIPTOR_ID 완료 후 값</a>
+  <a class="t1" href="#sec18">4 실행 방법</a>
+  <a class="t2" href="#sec19">4.1 환경과 명령</a>
+  <a class="t2" href="#sec20">4.2 판정</a>
+  <a class="t2" href="#sec21">4.3 실패 시 확인 순서</a>
+  <a class="t1" href="#sec22">5 커버 범위와 한계</a>
+  <a class="t2" href="#sec23">5.1 커버하는 것</a>
+  <a class="t2" href="#sec24">5.2 커버하지 않는 것 — 리셋값</a>
+  <a class="t2" href="#sec25">5.3 커버하지 않는 것 — 기능</a>
+  <a class="t2" href="#sec26">5.4 SOR 연계 — Sanity TC → SOR v2.0.0 테스트</a>
+  <a class="t2" href="#sec27">5.5 읽기·비교 규칙</a>
+  <a class="t1" href="#sec28">6 TB 구조</a>
+  <a class="t2" href="#sec29">6.1 전체 구성</a>
+  <a class="t2" href="#sec30">6.2 Scoreboard</a>
+  <a class="t2" href="#sec31">6.3 AXI4-Lite master</a>
+  <a class="t2" href="#sec32">6.4 메모리 모델의 제약</a>
+  <a class="t1" href="#sec33">7 유지보수</a>
+  <a class="t2" href="#sec34">7.1 파라미터를 바꿨을 때</a>
+  <a class="t2" href="#sec35">7.2 체크를 추가할 때</a>
+  <a class="t2" href="#sec36">7.3 문서 동기화</a>
+  <a class="t1" href="#sec37">부록 A 실측 로그 전문</a>
+  <a class="t1" href="#sec38">부록 B 체크 ↔ SFR 근거</a>
+  <a class="t1" href="#sec39">부록 C 이력</a>
+  <a class="t2" href="#sec40">C.1 설계 결정 반영 (2026-10-06)과 현재 상태</a>
+  <a class="t2" href="#sec41">C.2 결정 7 재조정</a>
+  <a class="t2" href="#sec42">C.3 TB 수정 이력</a>
+</div>
+
+<!-- ===================================================================== -->
+<h1 id="sec1">1 개요</h1>
+<h2 id="sec2">1.1 Sanity의 역할</h2>
+<p>Sanity는 RTL을 고칠 때마다 실행하는 회귀 게이트입니다. 목적은 레지스터 경로와 SG 기본 전송이 깨졌는지를 수 초 안에 판정하는 것이며, 기능을 넓게 검증하는 것이 아닙니다. 기능 검증은 SOR의 테스트 15개(T-01 ~ T-15)가 맡습니다. Sanity가 통과해도 SOR 테스트는 따로 실행하고, Sanity가 실패하면 SOR 테스트보다 먼저 원인을 해결합니다.</p>
+<table>
+  <tr><th style="width:18%">조건</th><th style="width:40%">구현</th><th>이유</th></tr>
+  <tr><td>짧은 실행 시간</td><td>시뮬레이션 6,305 ns, 실행 수 초</td><td>매 수정마다 실행하기 위함</td></tr>
+  <tr><td>자동 판정</td><td>체크마다 <code>[ ok ]</code> / <code>[FAIL]</code>, 요약에서 집계</td><td>로그를 사람이 해석하지 않아도 됨</td></tr>
+  <tr><td>종료 코드</td><td>실패 시 <code>$fatal(1)</code></td><td>스크립트·CI가 종료 코드로 판정</td></tr>
+  <tr><td>watchdog</td><td>전역 <code>#2_000_000</code> 후 <code>$fatal(1)</code></td><td>handshake가 멈춰도 회귀가 끝나도록</td></tr>
+</table>
+<pre>// global watchdog - a hung handshake must not hang the regression    (tb_sg_dma.sv:716~721)
+initial begin
+  #2_000_000;
+  $display("\n[FAIL] GLOBAL TIMEOUT - simulation did not finish");
+  $fatal(1, "global watchdog");
+end</pre>
+<p>전송 하나를 기다릴 때는 <code>wait_irq</code>에 별도 타임아웃(기본 50,000 클럭, tb_sg_dma.sv:366)이 있습니다. 이 타임아웃은 해당 TC의 FAIL 체크로 기록되어 어느 TC에서 멈췄는지 로그에 남습니다.</p>
+
+<h2 id="sec3">1.2 Sanity가 하지 않는 것</h2>
+<table>
+  <tr><th style="width:18%">항목</th><th>설명</th><th style="width:26%">담당</th></tr>
+  <tr><td>커버리지 측정</td><td>코드·기능 커버리지를 측정하지 않음</td><td>SOR에서도 제외 (COV-001)</td></tr>
+  <tr><td>전수 검사</td><td>레지스터 전체를 읽지 않음 (5.2)</td><td>SFR 부록 A (일회성 P 측정)</td></tr>
+  <tr><td>기능 검증</td><td>경계 조건, 에러 응답, 무작위 조합, backpressure</td><td>SOR T-05 ~ T-15</td></tr>
+  <tr><td>성능 측정</td><td>대역폭·지연</td><td>—</td></tr>
+</table>
+<p>이 범위는 2026-10-06 팀 결정입니다. 리셋값 체크를 Sanity에 추가하는 안이 논의되었으나 Sanity는 회귀 게이트 역할로 한정했습니다(부록 C.2).</p>
+
+<h2 id="sec4">1.3 SOR과의 관계</h2>
+<table>
+  <tr><th style="width:12%"></th><th style="width:44%">Sanity (이 문서)</th><th>SOR (<code>SGDMA-SOR-rel-v2.0.0</code>)</th></tr>
+  <tr><td>목적</td><td>레지스터 경로·SG 기본 전송의 회귀 판정</td><td>요구사항별 검증</td></tr>
+  <tr><td>규모</td><td>TC 7개 / 체크 46개</td><td>테스트 15개 (원래 요구사항 58건 흡수)</td></tr>
+  <tr><td>실행 시점</td><td>RTL 수정마다</td><td>검증 단계</td></tr>
+  <tr><td>상태</td><td>TB 구현 완료, 46/46 PASS</td><td>TB 보강(B1 ~ B6)이 필요한 테스트 있음</td></tr>
+</table>
+<div class="note"><p><b>Sanity 통과는 연결된 SOR 테스트의 통과가 아닙니다.</b> SOR 테스트는 같은 동작을 더 넓게 봅니다. 예를 들어 SAN-004는 T-03의 일부(데이터·guard·완료 비트)만 판정하고, descriptor 읽기 burst 형태(<code>ARLEN = 5</code>)는 로그에 출력만 합니다. SOR은 T-01 ~ T-04, T-09를 Sanity 재확인 단계로 따로 실행합니다.</p></div>
+
+<!-- ===================================================================== -->
+<h1 id="sec5">2 구성</h1>
+<h2 id="sec6">2.1 TC 목록</h2>
+<table>
+  <tr><th style="width:10%">TC</th><th style="width:28%">이름</th><th class="c" style="width:6%">체크</th><th style="width:9%">계층</th><th>목적</th><th style="width:14%">관련 SOR</th></tr>
+  <tr><td>SAN-001</td><td>Register identity</td><td class="c">5</td><td>레지스터</td><td>버스·주소 디코드 동작, 구성 상수 확인</td><td>T-01</td></tr>
+  <tr><td>SAN-002</td><td>Scratch R/W</td><td class="c">3</td><td>레지스터</td><td>쓰기 경로 확인</td><td>T-01</td></tr>
+  <tr><td>SAN-003</td><td>Reset defaults</td><td class="c">10</td><td>레지스터</td><td>리셋 직후 값</td><td>T-09 (IRQ_MASK)</td></tr>
+  <tr><td>SAN-007</td><td>Parameter-masked bits</td><td class="c">11</td><td>레지스터</td><td>미구현 비트·레지스터를 결함으로 오판하지 않도록 기대값 고정</td><td>T-02</td></tr>
+  <tr><td>SAN-004</td><td>Single descriptor copy</td><td class="c">4</td><td>전송</td><td>descriptor 1개 SG 전송</td><td>T-03</td></tr>
+  <tr><td>SAN-005</td><td>3-descriptor chain, gather</td><td class="c">6</td><td>전송</td><td>체인 따라가기</td><td>T-04</td></tr>
+  <tr><td>SAN-006</td><td>IRQ &amp; status</td><td class="c">7</td><td>전송</td><td>인터럽트 경로</td><td>T-09</td></tr>
+  <tr><td></td><td><b>합계</b></td><td class="c"><b>46</b></td><td></td><td></td><td></td></tr>
+</table>
+<p>TC별 SOR 연결의 상세(일부 겹침 포함)는 5.4에 있습니다.</p>
+
+<h2 id="sec7">2.2 실행 순서</h2>
+<pre>SAN-001 -&gt; SAN-002 -&gt; SAN-003 -&gt; SAN-007 -&gt; SAN-004 -&gt; SAN-005 -&gt; SAN-006
+|------------- 레지스터 계층 -------------|   |--------- 전송 계층 ---------|</pre>
+<table>
+  <tr><th style="width:34%">규칙</th><th>이유</th></tr>
+  <tr><td>레지스터 계층을 먼저</td><td>버스가 동작하지 않는 상태에서 전송을 돌리면 "전송 실패"와 "레지스터 접근 실패"를 구분할 수 없음</td></tr>
+  <tr><td>SAN-003은 SAN-007보다 앞</td><td>SAN-007이 <code>0xFFFF_FFFF</code>를 쓰므로 뒤에 두면 리셋값을 볼 수 없음</td></tr>
+  <tr><td>SAN-002는 SAN-003보다 앞이어도 됨</td><td><code>SCRATCH</code>는 SAN-003의 확인 대상이 아님</td></tr>
+  <tr><td>SAN-007은 원복 후 종료</td><td><code>CONTROL</code>을 0으로 되돌리지 않으면 SAN-004가 ENABLE = 1 상태로 시작함</td></tr>
+</table>
+<p>전송 계층에 들어가기 전에 공통 설정을 합니다 (tb_sg_dma.sv:706~707). SOR 표준 순서 2·3번과 같습니다.</p>
+<pre>axil_write(REG_IRQ_MASK, 32'h1);   // SOT 마스크, EOT 허용
+axil_write(REG_CONTROL,  32'h5);   // ENABLE | HWDESC</pre>
+
+<h2 id="sec8">2.3 판정 규칙</h2>
+<table>
+  <tr><th style="width:44%">상황</th><th>동작</th></tr>
+  <tr><td>체크 통과</td><td><code>[ ok ]</code> 출력, TC pass +1</td></tr>
+  <tr><td>체크 실패</td><td><code>[FAIL]</code> + 기대값·측정값 출력, TC fail +1</td></tr>
+  <tr><td>TC 안에서 fail ≥ 1</td><td>그 TC는 FAIL. 이후 TC는 계속 실행</td></tr>
+  <tr><td><code>VERSION</code> 또는 <code>IDENTIFICATION</code> 불일치</td><td>나머지 6개 TC를 SKIP하고 종료</td></tr>
+  <tr><td>FAIL 또는 SKIP이 1건 이상</td><td><code>*** SANITY FAILED ***</code> + <code>$fatal(1)</code></td></tr>
+  <tr><td>모두 통과</td><td><code>*** SANITY PASSED ***</code> + <code>$finish</code></td></tr>
+</table>
+<p><b>중단 조건을 VERSION / IDENTIFICATION 둘로 한정한 이유.</b> 초기 구현은 SAN-001의 체크가 하나라도 틀리면 나머지를 모두 SKIP했고, <code>INTERFACE_DESCRIPTION_2</code> 기대값이 틀렸을 때 정상 RTL인데도 TC 6개가 SKIP되었습니다(부록 C.3). <code>INTERFACE_DESCRIPTION_1/2</code>와 <code>PERIPHERAL_ID</code>는 구성 상수이므로, 값이 틀리면 버스 고장보다 기대값 오류일 가능성이 큽니다. 그래서 <code>bus_ok</code> 플래그(tb_sg_dma.sv:197)를 따로 두고 두 레지스터만 게이트로 씁니다. 구성 레지스터가 틀리면 다음 안내를 출력합니다.</p>
+<pre>note : build-configuration register mismatch - confirm the
+       expected value before treating it as an RTL defect.</pre>
+<div class="note"><p><b>체크별 예외는 없습니다.</b> 3.8의 구현 특성 체크 2개도 다른 체크와 똑같이 집계되므로, 틀리면 <code>*** SANITY FAILED ***</code>가 됩니다. 문서가 정하는 것은 실패의 해석입니다.</p></div>
+
+<!-- ===================================================================== -->
+<h1 id="sec9">3 TC 상세</h1>
+<p>각 TC는 목적 → 절차·구성 → 체크 → 주의 → SOR 연결 순서입니다. "실패 시 확인" 열은 그 체크가 FAIL했을 때 먼저 볼 곳입니다. 기대값의 근거는 부록 B와 SFR v2.0.0에 있습니다.</p>
+
+<h2 id="sec10">3.1 SAN-001 Register identity (5 checks)</h2>
+<p><b>목적</b>: AXI4-Lite 접근과 주소 디코드가 동작하는지, 의도한 파라미터로 만들어졌는지 확인합니다.</p>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th style="width:30%">체크</th><th style="width:16%">기대값</th><th style="width:9%">SFR</th><th>실패 시 확인</th></tr>
+  <tr><td class="c">1</td><td><code>VERSION</code> (0x000)</td><td><code>0x0004_0565</code></td><td>4.1.1</td><td>버스·디코드 고장. 나머지 TC SKIP</td></tr>
+  <tr><td class="c">2</td><td><code>IDENTIFICATION</code> (0x00C)</td><td><code>0x444D_4143</code></td><td>4.1.4</td><td>위와 같음</td></tr>
+  <tr><td class="c">3</td><td><code>PERIPHERAL_ID</code> (0x004)</td><td><code>0x0000_0000</code></td><td>4.1.2</td><td><code>ID</code> 파라미터 변경 또는 기대값 오류</td></tr>
+  <tr><td class="c">4</td><td><code>INTERFACE_DESCRIPTION_1</code> (0x010)</td><td><code>0x3807_0303</code></td><td>4.1.5</td><td><code>DATA_WIDTH</code>/<code>MAX_BYTES_PER_BURST</code> 변경, 기대값 미갱신</td></tr>
+  <tr><td class="c">5</td><td><code>INTERFACE_DESCRIPTION_2</code> (0x014)</td><td><code>0x0000_0000</code></td><td>4.1.6</td><td><code>AXI_AXCACHE</code>/<code>AXI_AXPROT</code> 변경. 기대값부터 확인</td></tr>
+</table>
+<p>체크 4는 beat 크기(8바이트), burst 크기(128바이트), 소스·목적지 타입(둘 다 AXI-MM)을 한 번에 확인합니다. 비트 배치는 SFR §4.1.5에 있습니다.</p>
+<div class="note"><p><b>체크 5의 이력.</b> 정리 전 <code>axi_dmac_regmap.v</code>의 모듈 기본값 <code>AXI_AXCACHE = 4'b0011</code>을 보고 기대값을 <code>0x30</code>으로 계산한 문서가 두 건 있었고 둘 다 틀렸습니다. 실제 값은 상위 모듈이 넘기는 파라미터로 정해집니다. 현재는 <code>sg_dma_top</code> 파라미터가 <code>4'b0000</code>이고 regmap 기본값도 <code>4'b0000</code>입니다. 기대값은 항상 <code>sg_dma_top</code> 파라미터에서 계산합니다.</p></div>
+<p><b>SOR 연결</b>: T-01 (REG-001, REG-002, REG-004, REG-005, REG-020) — 같은 5개 값, 같은 SKIP 규칙. T-14 (AXI-007) — 체크 5는 레지스터 값만 보며, 세 포트의 실제 AxCACHE/AxPROT 출력은 T-14가 봅니다.</p>
+
+<h2 id="sec11">3.2 SAN-002 Scratch R/W (3 checks)</h2>
+<p><b>목적</b>: 쓰기 경로를 확인합니다. <code>SCRATCH</code>(0x008)는 기능이 없어 써도 부작용이 없습니다.</p>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th style="width:22%">쓰는 값</th><th style="width:16%">읽기 기대값</th><th>실패 시 확인</th></tr>
+  <tr><td class="c">1</td><td><code>0xA5A5_5A5A</code></td><td>같은 값</td><td>쓰기 경로 고장 또는 stuck-at 비트</td></tr>
+  <tr><td class="c">2</td><td><code>0x5A5A_A5A5</code></td><td>같은 값</td><td>1과 비교하면 어느 비트가 고착인지 보임</td></tr>
+  <tr><td class="c">3</td><td><code>0x0000_0000</code></td><td>같은 값</td><td>stuck-at-1. 원복 실패</td></tr>
+</table>
+<p>반전 패턴 두 개를 써야 32비트 각각이 0과 1 양쪽으로 동작하는지 확인됩니다. 마지막 0 쓰기는 원복입니다.</p>
+<p><b>SOR 연결</b>: T-01 (REG-003). WSTRB 동작은 T-02 (REG-023).</p>
+
+<h2 id="sec12">3.3 SAN-003 Reset defaults (10 checks)</h2>
+<p><b>목적</b>: HW 리셋 해제 직후의 레지스터 값을 확인합니다.</p>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th style="width:28%">레지스터</th><th style="width:16%">기대값</th><th style="width:20%">비고</th><th>실패 시 확인</th></tr>
+  <tr><td class="c">1</td><td><code>CONTROL</code> (0x400)</td><td>0x0000_0000</td><td>HWDESC도 0</td><td>리셋 경로 또는 초기값 변경</td></tr>
+  <tr><td class="c">2</td><td><code>IRQ_MASK</code> (0x080)</td><td><b>0x0000_0003</b></td><td>0이 아님</td><td>초기값 변경</td></tr>
+  <tr><td class="c">3</td><td><code>IRQ_PENDING</code> (0x084)</td><td>0x0000_0000</td><td></td><td>리셋 직후 인터럽트 대기 중</td></tr>
+  <tr><td class="c">4</td><td><code>IRQ_SOURCE</code> (0x088)</td><td>0x0000_0000</td><td></td><td>리셋 직후 이벤트 기록됨</td></tr>
+  <tr><td class="c">5</td><td><code>FLAGS</code> (0x40C)</td><td><b>0x0000_0002</b></td><td>0이 아님</td><td>초기값 변경</td></tr>
+  <tr><td class="c">6</td><td><code>TRANSFER_DONE</code> (0x428)</td><td>0x0000_0000</td><td></td><td>리셋 직후 완료 비트</td></tr>
+  <tr><td class="c">7</td><td><code>TRANSFER_ID</code> (0x404)</td><td>0x0000_0000</td><td></td><td>ID 초기값 변경</td></tr>
+  <tr><td class="c">8</td><td><code>DEST_ADDRESS</code> (0x410)</td><td>0x0000_0000</td><td></td><td>주소 레지스터 리셋 누락</td></tr>
+  <tr><td class="c">9</td><td><code>SRC_ADDRESS</code> (0x414)</td><td>0x0000_0000</td><td></td><td>위와 같음</td></tr>
+  <tr><td class="c">10</td><td><code>SG_ADDRESS</code> (0x47C)</td><td>0x0000_0000</td><td></td><td>위와 같음</td></tr>
+</table>
+<div class="note"><p><b>0이 아닌 리셋값은 <code>IRQ_MASK = 0x3</code>, <code>FLAGS = 0x2</code> 두 개입니다.</b> "리셋 후 전부 0"을 가정한 테스트는 이 두 곳에서 FAIL합니다. <code>CONTROL.HWDESC</code>의 리셋값도 0이므로 SG 모드는 드라이버가 <code>CONTROL ← 0x5</code>를 써야 동작합니다.</p></div>
+<p>이 TC는 리셋값 10개만 봅니다. 나머지는 5.2에 있으며, SFR v2.0.0 부록 A에 일회성 측정값(P)이 있습니다.</p>
+<p><b>SOR 연결</b>: T-09 (IRQ-003) 1단계가 리셋 직후 <code>IRQ_MASK = 0x3</code>을 다시 봅니다. 나머지 9개는 SOR에 대응 테스트가 없으므로(5.3), 회귀로 확인되는 리셋값의 근거는 이 TC뿐입니다.</p>
+
+<h2 id="sec13">3.4 SAN-007 Parameter-masked bits (11 checks)</h2>
+<p><b>목적은 결함 검출이 아니라 오판 방지입니다.</b> RTL에서 제거된 기능의 비트와 레지스터는 써도 바뀌지 않습니다. 이것을 모르고 "RW 레지스터 write/read-back" 테스트를 만들면 정상 동작을 결함으로 보고합니다. 기대값을 문서와 TB 양쪽에 고정합니다.</p>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th style="width:26%">동작</th><th style="width:15%">기대값</th><th style="width:25%">이유</th><th>실패 시 확인</th></tr>
+  <tr><td class="c">1</td><td><code>W(0x400, 0xFFFF_FFFF)</code> → R</td><td>0x0000_0007</td><td>CONTROL[3] framelock 미구현</td><td>regmap 읽기 비트 구성 변경</td></tr>
+  <tr><td class="c">2</td><td><code>W(0x40C, 0xFFFF_FFFF)</code> → R</td><td>0x0000_0006</td><td>FLAGS[0] cyclic 미구현</td><td>위와 같음</td></tr>
+  <tr><td class="c">3</td><td><code>W(0x410, 0xFFFF_FFFF)</code> → R</td><td>0xFFFF_FFF8</td><td>64비트 데이터 → 8바이트 정렬</td><td><code>DATA_WIDTH</code> 변경 또는 정렬 마스크 변경</td></tr>
+  <tr><td class="c">4</td><td><code>W(0x414, 0xFFFF_FFFF)</code> → R</td><td>0xFFFF_FFF8</td><td>위와 같음</td><td>위와 같음</td></tr>
+  <tr><td class="c">5</td><td><code>W(0x47C, 0xFFFF_FFFF)</code> → R</td><td>0xFFFF_FFF8</td><td>SG 포트 64비트</td><td>위와 같음</td></tr>
+  <tr><td class="c">6</td><td><code>W(0x490, 0xFFFF_FFFF)</code> → R</td><td>0x0000_0000</td><td><code>ADDR_WIDTH = 32</code></td><td><code>ADDR_WIDTH</code>가 64로 바뀜 (7.1)</td></tr>
+  <tr><td class="c">7</td><td><code>W(0x494, 0xFFFF_FFFF)</code> → R</td><td>0x0000_0000</td><td>위와 같음</td><td>위와 같음</td></tr>
+  <tr><td class="c">8</td><td><code>W(0x4BC, 0xFFFF_FFFF)</code> → R</td><td>0x0000_0000</td><td>위와 같음</td><td>위와 같음</td></tr>
+  <tr><td class="c">9</td><td><code>R(0x41C)</code> Y_LENGTH</td><td>0x0000_0000</td><td>2D 미구현</td><td>주소 디코드 변경</td></tr>
+  <tr><td class="c">10</td><td><code>R(0x458)</code> FRAMELOCK_CONFIG</td><td>0x0000_0000</td><td>framelock 미구현</td><td>위와 같음</td></tr>
+  <tr><td class="c">11</td><td><code>R(0x0F0)</code>, <code>R(0x600)</code></td><td>둘 다 0x0000_0000</td><td>미정의 주소</td><td><b>주소 디코드 오류</b></td></tr>
+</table>
+<p>로그의 체크 이름은 정리 전 표기를 유지합니다(<code>CONTROL[3] masked (FRAMELOCK=0)</code>, <code>FLAGS[0] masked (DMA_CYCLIC=0)</code>, <code>Y_LENGTH tied 0 (2D=0)</code>). 정리 전에는 파라미터로 꺼진 기능이었고, 정리 후에는 RTL에서 제거된 기능입니다. 기대값은 같습니다.</p>
+<p><b>체크 6~8</b>: <code>*_ADDRESS_HIGH</code>는 <code>if (HAS_ADDR_HIGH)</code> 조건 때문에 쓰기 로직이 만들어지지 않습니다. <b>체크 11</b>: 이 IP는 미정의 주소에도 에러 응답을 내지 않으므로(BRESP/RRESP 항상 OKAY), readback 비교가 주소 디코드 오류를 잡는 유일한 방법입니다.</p>
+<div class="info"><p><b><code>0x450</code>(PARTIAL_TRANSFER_ID)은 읽지 않습니다.</b> 정리 전 RTL에서는 이 주소를 읽으면 내부 partial FIFO가 pop되었습니다. 정리 후에는 레지스터가 없어 읽어도 0이고 부작용이 없습니다(SFR §4.5.5, P). TB는 이전 동작을 그대로 두어 이 주소를 읽지 않으며, SOR T-02가 0x44C/0x450 읽기를 맡습니다.</p></div>
+<p>이 TC는 건드린 레지스터를 모두 되돌린 뒤 끝납니다 (tb_sg_dma.sv:507~514).</p>
+<pre>axil_write(REG_CONTROL,      32'h0000_0000);   // 안 하면 SAN-004가 ENABLE=1로 시작
+axil_write(REG_FLAGS,        EXP_FLAGS_RESET);
+axil_write(REG_DEST_ADDRESS, 32'h0000_0000);
+axil_write(REG_SRC_ADDRESS,  32'h0000_0000);
+axil_write(REG_SG_ADDRESS,   32'h0000_0000);</pre>
+<p><b>SOR 연결</b>: T-02 (REG-021, REG-022) — 같은 11개 동작에 더해 <code>0x420</code>, <code>0x424</code>, <code>0x44C</code>, <code>0x450</code>, <code>0x45C</code> 읽기, RO 레지스터 쓰기(REG-019), WSTRB 무시(REG-023). T-13 (DESC-008) — 체크 5는 레지스터가 하위 3비트를 버리는 것만 보며, 실제 descriptor 읽기 주소는 T-13이 봅니다.</p>
+
+<h2 id="sec14">3.5 SAN-004 Single descriptor copy (4 checks)</h2>
+<p><b>목적</b>: descriptor 1개를 읽고 MM→MM 전송을 끝내는지 확인합니다.</p>
+<table>
+  <tr><th style="width:18%">항목</th><th>값</th></tr>
+  <tr><td>descriptor</td><td><code>0x0000_1000</code>, <code>id = 0xA0</code>, <code>flags = 0b11</code> (LAST | EOT_IRQ)</td></tr>
+  <tr><td>전송</td><td><code>0x0001_0000</code> → <code>0x0002_0000</code>, 256바이트 (<code>x_len = 255</code>)</td></tr>
+</table>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th style="width:24%">체크</th><th style="width:34%">내용</th><th>실패 시 확인</th></tr>
+  <tr><td class="c">1</td><td><code>irq asserted</code></td><td>EOT 인터럽트 (타임아웃 50,000 클럭)</td><td>전송 미완료 또는 인터럽트 경로 고장 (4.3)</td></tr>
+  <tr><td class="c">2</td><td><code>data</code></td><td>256바이트 바이트 단위 일치</td><td>descriptor 해석(주소·길이) 또는 데이터 경로</td></tr>
+  <tr><td class="c">3</td><td><code>tail</code></td><td>목적지 뒤 16바이트가 쓰이지 않음</td><td>범위 초과 쓰기 — 길이 해석이 1 이상 큼</td></tr>
+  <tr><td class="c">4</td><td><code>TRANSFER_DONE bit set</code></td><td><code>[3:0]</code> 중 하나 이상 1</td><td>완료 비트 경로</td></tr>
+</table>
+<p><b>체크 3이 필요한 이유</b>: 데이터 비교만으로는 범위 밖에 쓰는 결함을 잡지 못합니다. 메모리 모델이 바이트마다 쓰였는지 기록하므로(<code>mem_written()</code>) 목적지 뒤 16바이트가 쓰이지 않았는지 확인합니다.</p>
+<h4 class="notoc">관측된 버스 동작</h4>
+<pre>[3195000]   SG AR  addr=0x00001000 beats=6 size=8B     &lt;- descriptor fetch, 48 B
+[3315000]  SRC AR  addr=0x00010000 beats=16 size=8B    &lt;- 128 B
+[3495000]  DST AW  addr=0x00020000 beats=16 size=8B
+[3495000]  SRC AR  addr=0x00010080 beats=16 size=8B    &lt;- 128 B (분할)
+[3705000]  DST AW  addr=0x00020080 beats=16 size=8B</pre>
+<ul>
+  <li>descriptor 읽기는 6 beat × 64비트 = 48바이트 INCR burst 1개입니다 (<code>ARLEN = 5</code>, <code>ARSIZE = 3</code>).</li>
+  <li>256바이트 전송은 <code>MAX_BYTES_PER_BURST = 128</code>에 따라 burst 2개로 나뉩니다.</li>
+</ul>
+<div class="note"><p><b>위 버스 동작은 출력만 하고 판정하지 않습니다.</b> descriptor 읽기 형태는 SOR T-03 (AXI-001, DESC-001), 128바이트 분할은 T-07 (FUNC-006), "소스 burst를 다 읽은 뒤 쓰기"는 T-07 (FUNC-007)이 판정합니다.</p></div>
+<p><b>SOR 연결</b>: T-03 (REG-007, REG-015, DESC-001~003, DESC-007, FUNC-001, FUNC-009, AXI-001) — 같은 descriptor·주소·길이에 더해 버스 요청 형태, <code>SG_ADDRESS</code> readback, <code>DESCRIPTOR_ID = 0xA0</code>(참고 체크)를 봅니다. Sanity는 이 TC에서 <code>DESCRIPTOR_ID</code>를 읽지 않습니다. T-07 (FUNC-006, FUNC-007) — 위 3,315 ns → 3,495 ns를 참고 측정값으로 씁니다. T-10 (REG-013) — 체크 4는 완료 시 세트만 보며, 재제출 시 clear는 T-10이 봅니다.</p>
+
+<h2 id="sec15">3.6 SAN-005 3-descriptor chain, gather (6 checks)</h2>
+<p><b>목적</b>: <code>next_sg_addr</code>를 따라 체인을 처리하는지 확인합니다. 흩어진 소스 3곳을 연속된 목적지에 모읍니다.</p>
+<table>
+  <tr><th class="c" style="width:6%">#</th><th style="width:16%">descriptor 주소</th><th class="c" style="width:7%">id</th><th class="c" style="width:8%">flags</th><th style="width:16%">소스</th><th style="width:16%">목적지</th><th class="c">길이</th></tr>
+  <tr><td class="c">0</td><td>0x0000_1100</td><td class="c">0xB0</td><td class="c">0b00</td><td>0x0001_1000</td><td>0x0002_1000</td><td class="c">128</td></tr>
+  <tr><td class="c">1</td><td>0x0000_1140</td><td class="c">0xB1</td><td class="c">0b00</td><td>0x0001_3000</td><td>0x0002_1080</td><td class="c">256</td></tr>
+  <tr><td class="c">2</td><td>0x0000_1180</td><td class="c">0xB2</td><td class="c"><b>0b11</b></td><td>0x0001_5000</td><td>0x0002_1180</td><td class="c">64</td></tr>
+</table>
+<figure>
+<div class="ftitle">SG_ADDRESS를 한 번 쓰면 descriptor 3개를 따라가며 조각 3개를 모은다</div>
+<svg viewBox="0 0 680 300">
+  <text x="20" y="18" class="s mu">SG_ADDRESS = 0x1100 (CPU가 씀)</text>
+  <path class="ln" d="M 30 24 L 30 52" marker-end="url(#a)"/>
+  <!-- descriptors -->
+  <rect class="bsg" x="20" y="54" width="180" height="88" rx="4"/>
+  <text x="30" y="72" class="md tt">D0 @0x1100 · id 0xB0</text>
+  <text x="30" y="90" class="s m">src  0x11000 · 128 B</text>
+  <text x="30" y="105" class="s m">dst  0x21000</text>
+  <text x="30" y="120" class="s m">next 0x1140</text>
+  <text x="30" y="135" class="s m mu">flags 00</text>
+  <rect class="bsg" x="250" y="54" width="180" height="88" rx="4"/>
+  <text x="260" y="72" class="md tt">D1 @0x1140 · id 0xB1</text>
+  <text x="260" y="90" class="s m">src  0x13000 · 256 B</text>
+  <text x="260" y="105" class="s m">dst  0x21080</text>
+  <text x="260" y="120" class="s m">next 0x1180</text>
+  <text x="260" y="135" class="s m mu">flags 00</text>
+  <rect class="bsg" x="480" y="54" width="180" height="88" rx="4" style="stroke-width:2.2"/>
+  <text x="490" y="72" class="md tt">D2 @0x1180 · id 0xB2</text>
+  <text x="490" y="90" class="s m">src  0x15000 · 64 B</text>
+  <text x="490" y="105" class="s m">dst  0x21180</text>
+  <text x="490" y="120" class="s m mu">next (무시)</text>
+  <text x="490" y="135" class="s m tt">flags 11 = LAST + EOT_IRQ</text>
+  <path class="lns" d="M 200 98 L 248 98" marker-end="url(#as)"/><text x="210" y="92" class="xs sgc">next</text>
+  <path class="lns" d="M 430 98 L 478 98" marker-end="url(#as)"/><text x="440" y="92" class="xs sgc">next</text>
+  <!-- source memory -->
+  <rect class="bext" x="20" y="180" width="640" height="34"/>
+  <text x="560" y="202" class="s mu">source memory (흩어짐)</text>
+  <rect class="bdp" x="70" y="184" width="60" height="26"/><text x="94" y="202" class="md tt">A</text>
+  <rect class="bdp" x="270" y="184" width="120" height="26"/><text x="324" y="202" class="md tt">B</text>
+  <rect class="bdp" x="490" y="184" width="30" height="26"/><text x="500" y="202" class="md tt">C</text>
+  <text x="70" y="226" class="xs m mu">0x11000</text><text x="270" y="226" class="xs m mu">0x13000</text><text x="482" y="226" class="xs m mu">0x15000</text>
+  <path class="lnd" d="M 110 142 L 100 182" marker-end="url(#ag)"/>
+  <path class="lnd" d="M 340 142 L 330 182" marker-end="url(#ag)"/>
+  <path class="lnd" d="M 560 142 L 506 182" marker-end="url(#ag)"/>
+  <!-- dest memory -->
+  <rect class="bext" x="20" y="250" width="640" height="34"/>
+  <text x="440" y="272" class="s mu">destination memory (0x21000부터 이어 붙임)</text>
+  <rect class="bdp" x="200" y="254" width="60" height="26"/><text x="224" y="272" class="md tt">A</text>
+  <rect class="bdp" x="260" y="254" width="120" height="26"/><text x="314" y="272" class="md tt">B</text>
+  <rect class="bdp" x="380" y="254" width="30" height="26"/><text x="390" y="272" class="md tt">C</text>
+  <path class="lno" d="M 100 210 L 228 252" marker-end="url(#ao)"/>
+  <path class="lno" d="M 330 210 L 320 252" marker-end="url(#ao)"/>
+  <path class="lno" d="M 505 210 L 396 252" marker-end="url(#ao)"/>
+</svg>
+<figcaption>Figure 1. SAN-005 descriptor chain. 파란 상자는 메모리의 descriptor, 주황 상자는 데이터 영역입니다.</figcaption>
+</figure>
+<p>마지막 descriptor에만 <code>flags = 0b11</code>을 둡니다. 이렇게 하면 <code>TRANSFER_ID</code>와 <code>TRANSFER_DONE</code>이 1:1로 맞고 인터럽트도 체인당 1회입니다. 모든 descriptor에 <code>flags[1]</code>을 켜면 두 값이 어긋납니다 (SFR §6.2).</p>
+<table>
+  <tr><th class="c" style="width:6%">#</th><th style="width:28%">체크</th><th style="width:22%">내용</th><th>실패 시 확인</th></tr>
+  <tr><td class="c">1</td><td><code>irq asserted</code></td><td>체인 전체 완료 후 1회</td><td>체인을 끝까지 따라가지 못함, 또는 LAST에서 멈추지 않음</td></tr>
+  <tr><td class="c">2~4</td><td><code>seg0</code> / <code>seg1</code> / <code>seg2</code></td><td>구간별 바이트 일치</td><td>해당 descriptor의 해석 또는 <code>next_sg_addr</code> 처리</td></tr>
+  <tr><td class="c">5</td><td><code>tail</code></td><td>448바이트 뒤 16바이트 미기입</td><td>마지막 구간 범위 초과</td></tr>
+  <tr><td class="c">6</td><td><code>DESCRIPTOR_ID = last of chain</code></td><td><code>0x0000_00B2</code></td><td><b>구현 특성 체크</b> (3.8)</td></tr>
+</table>
+<h4 class="notoc">관측된 prefetch</h4>
+<pre>[4215000]   SG AR  addr=0x00001100    &lt;- descriptor 0
+[4295000]   SG AR  addr=0x00001140    &lt;- descriptor 1
+[4335000]  SRC AR  addr=0x00011000    &lt;- 첫 데이터 읽기
+[4375000]   SG AR  addr=0x00001180    &lt;- descriptor 2
+[4515000]  DST AW  addr=0x00021000    &lt;- 첫 데이터 쓰기</pre>
+<p>descriptor 3개가 첫 목적지 쓰기 전에 모두 읽힙니다. descriptor fetch와 데이터 전송이 겹쳐 진행된다는 측정 결과이며, 판정은 SOR T-04 (DESC-009)가 합니다. 전체 타이밍은 Architecture Spec Figure 10에 있습니다.</p>
+<p><b>SOR 연결</b>: T-04 (DESC-004, DESC-009, FUNC-002) — 같은 체인으로 descriptor 읽기 순서·횟수, prefetch, irq 횟수, <code>TRANSFER_ID</code> 증가를 판정. T-06 (FUNC-004) — Sanity는 체인 길이 3만 봄. T-08 (DESC-005, DESC-006, REG-016) — Sanity는 마지막 descriptor 인터럽트만 보며, 체크 6은 T-08의 <code>DESCRIPTOR_ID</code> 관측과 겹치고 SOR에서도 참고 체크입니다.</p>
+
+<h2 id="sec16">3.7 SAN-006 IRQ &amp; status (7 checks)</h2>
+<p><b>목적</b>: 인터럽트 경로 전체(이벤트 래치 → 마스크 → <code>irq</code> → W1C)를 확인합니다. 구성: descriptor 1개(<code>id = 0xC5</code>, 64바이트), <code>IRQ_MASK = 0x1</code>.</p>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th style="width:26%">체크</th><th style="width:13%">기대값</th><th style="width:22%">확인 내용</th><th>실패 시 확인</th></tr>
+  <tr><td class="c">1</td><td><code>IRQ_MASK = 0x1</code></td><td>0x0000_0001</td><td>앞서 쓴 마스크 유지</td><td>마스크 레지스터 쓰기·유지</td></tr>
+  <tr><td class="c">2</td><td><code>irq asserted</code></td><td>—</td><td>전송 완료 후 irq</td><td>전송 미완료 또는 EOT가 irq까지 전달되지 않음</td></tr>
+  <tr><td class="c">3</td><td><code>IRQ_PENDING[1] set</code></td><td>[1] = 1</td><td>EOT가 pending에 반영</td><td>마스크 게이트 로직</td></tr>
+  <tr><td class="c">4</td><td><code>IRQ_PENDING cleared</code></td><td>0x0000_0000</td><td>W1C 후</td><td>W1C 동작</td></tr>
+  <tr><td class="c">5</td><td><code>IRQ_SOURCE[0] survives W1C</code></td><td><b>0x0000_0001</b></td><td>마스크된 SOT가 SOURCE에 남음</td><td>마스크가 이벤트 래치까지 막도록 바뀜, 또는 W1C가 쓰지 않은 비트까지 지움</td></tr>
+  <tr><td class="c">6</td><td><code>irq de-asserted after W1C</code></td><td>irq = 0</td><td>level 신호 해제</td><td>clear 후에도 irq 유지</td></tr>
+  <tr><td class="c">7</td><td><code>DESCRIPTOR_ID</code></td><td>0x0000_00C5</td><td>완료 후 값</td><td><b>구현 특성 체크</b> (3.8)</td></tr>
+</table>
+<p><b>체크 5</b>는 <code>IRQ_MASK</code>가 이벤트 기록을 막지 않는다는 것을 확인합니다. 마스크된 SOT도 <code>IRQ_SOURCE[0]</code>에 기록되고 <code>IRQ_PENDING</code>에만 보이지 않습니다. 따라서 W1C로 [1]만 지우면 <code>IRQ_SOURCE</code>에 <code>0x1</code>이 남습니다.</p>
+<div class="note"><p><b>마스크를 풀면 쌓여 있던 이벤트가 바로 인터럽트로 나갑니다.</b> 마스크를 풀기 전에 <code>IRQ_PENDING</code>에 <code>0x3</code>을 써서 비웁니다. <code>IRQ_PENDING</code>에 쓰면 실제로 지워지는 것은 <code>IRQ_SOURCE</code>입니다 (SFR §4.2.2).</p></div>
+<p><b>SOR 연결</b>: T-09 (IRQ-002~005) — Sanity는 마스크 <code>0x1</code>만 보며, T-09는 <code>0x3</code>, <code>0x2</code>, <code>0x1</code>, <code>0x0</code>과 "비우지 않고 마스크 해제"를 봅니다. T-08 (IRQ-001, REG-016, DESC-006) — 체크 2는 EOT 인터럽트의 가장 단순한 경우이고, 체크 7은 T-08의 관측과 겹치며 SOR에서도 참고 체크입니다.</p>
+
+<h2 id="sec17">3.8 구현 특성 체크 — DESCRIPTOR_ID 완료 후 값</h2>
+<table>
+  <tr><th>체크</th><th style="width:18%">기대값</th><th style="width:16%">부록 B 번호</th></tr>
+  <tr><td>SAN-005 #6 <code>DESCRIPTOR_ID = last of chain</code></td><td>0x0000_00B2</td><td>39</td></tr>
+  <tr><td>SAN-006 #7 <code>DESCRIPTOR_ID</code></td><td>0x0000_00C5</td><td>46</td></tr>
+</table>
+<h4 class="notoc">구현 특성인 이유</h4>
+<p>전송이 끝난 뒤 <code>DESCRIPTOR_ID</code>가 마지막 descriptor의 id를 계속 보여 주는 것은 <code>util_axis_fifo</code>의 구현 특성이며 ADI가 문서로 보장한 동작이 아닙니다. <code>dmac_sg</code>는 descriptor가 완료될 때마다 ID FIFO에서 하나를 꺼내고(dmac_sg.v:278~289), FIFO가 비면 출력이 갱신되지 않아 마지막 값이 남습니다. 선행 문서에는 "이전 전송의 stale 값이 보일 수 있다"는 경고가 있었으나, SAN-005가 앞선 SAN-004의 <code>0xA0</code>이 아니라 자기 체인의 <code>0xB2</code>를 읽어 이를 반증했습니다.</p>
+<p>정리 후 확인된 추가 동작(SFR §4.6.2, P): HWDESC = 1이고 완료된 descriptor가 없으면 값이 정의되지 않고(시뮬레이션 X), HWDESC = 0이면 0입니다. Sanity는 두 경우 모두 읽지 않습니다.</p>
+<h4 class="notoc">해석 규칙 (SOR v2.0.0 §2.1과 같음)</h4>
+<p>SOR은 판정을 판정 / 참고 체크 / 관찰 기록 / 관측 후 확정으로 나누고, "<code>DESCRIPTOR_ID</code>의 전송 완료 후 값은 항상 참고 체크"로 정했습니다. 이 두 체크는 그 규칙의 대상입니다.</p>
+<div class="note"><p><b>이 체크가 FAIL하면 RTL 결함보다 "구현이 바뀌었다"는 신호로 먼저 봅니다.</b></p>
+<ol>
+  <li><code>dmac_sg.v</code>와 <code>util_axis_fifo.v</code>가 바뀌었는지 확인합니다.</li>
+  <li>바뀌었고 나머지 44개 체크가 통과했다면 구현 특성의 변화입니다. 기대값과 이 문서를 고칩니다.</li>
+  <li>바뀐 것이 없는데 FAIL하면 RTL 문제로 조사합니다.</li>
+</ol>
+<p>드라이버는 이 값을 완료 판정에 쓰지 않습니다. 완료는 EOT 인터럽트나 <code>TRANSFER_DONE</code>으로 확인합니다 (SFR §4.6.2).</p></div>
+<p><b>현재 TB 처리</b>: 2.3의 판정 규칙에 체크별 예외가 없으므로 이 두 체크도 게이트 판정에 들어갑니다. 향후 TB에서 두 체크를 경고(WARN)로 낮춰 게이트에서 빼는 것을 권장합니다. 바꿀 경우 체크 수 집계와 요약 형식이 달라질 수 있으므로 7.2 규칙대로 TB 헤더·이 문서·부록 B를 함께 고칩니다.</p>
+
+<!-- ===================================================================== -->
+<h1 id="sec18">4 실행 방법</h1>
+<h2 id="sec19">4.1 환경과 명령</h2>
+<table>
+  <tr><th style="width:30%">경로</th><th>내용</th></tr>
+  <tr><td><code>rtl/</code></td><td>DUT RTL 18개 파일 (<code>sg_dma_top.v</code> 외)</td></tr>
+  <tr><td><code>tb/</code></td><td><code>tb_sg_dma.sv</code>(top TB), <code>axi_mem_slave.sv</code>(AXI slave 모델), <code>tb_mem_pkg.sv</code>(공유 메모리)</td></tr>
+  <tr><td><code>filelists/rtl.f</code>, <code>tb.f</code></td><td>컴파일 목록 (<code>-i ../rtl</code>로 <code>inc_id.vh</code> 포함)</td></tr>
+  <tr><td><code>xsim/</code></td><td><code>Makefile</code>, <code>sourceme</code>(Vivado 환경), <code>xsim_run.tcl</code>(파형 덤프용)</td></tr>
+</table>
+<pre>cd xsim
+source sourceme          # Vivado 2024.2 환경 (이미 설정되어 있으면 생략)
+make clean &amp;&amp; make sim</pre>
+<table>
+  <tr><th style="width:18%">타깃</th><th>동작</th></tr>
+  <tr><td><code>make sim</code></td><td>컴파일 + elaborate + batch 실행. 회귀 게이트</td></tr>
+  <tr><td><code>make wave</code></td><td>전체 신호를 <code>dump/tb_sg_dma_snap.wdb</code>로 기록하며 실행</td></tr>
+  <tr><td><code>make view</code></td><td><code>make wave</code>가 만든 <code>.wdb</code>를 GUI로 열기</td></tr>
+  <tr><td><code>make gui</code></td><td>snapshot을 GUI로 열기 (신호 추가 후 <code>run all</code>)</td></tr>
+  <tr><td><code>make clean</code></td><td>시뮬레이션 산출물 삭제</td></tr>
+</table>
+<div class="note"><p><b><code>make clean</code>을 생략하지 않습니다.</b> <code>xelab</code>은 소스가 아니라 컴파일된 라이브러리(<code>xsim.dir/work/</code>)를 읽으므로, RTL을 고친 뒤 <code>make sim</code>만 하면 이전 코드로 실행될 수 있습니다. 파일·모듈 이름을 바꾼 경우 특히 주의합니다.</p></div>
+
+<h2 id="sec20">4.2 판정</h2>
+<pre>SANITY: 7 PASS / 0 FAIL / 0 SKIP     (46/46 checks)
+*** SANITY PASSED ***</pre>
+<table>
+  <tr><th style="width:44%">종료</th><th>의미</th></tr>
+  <tr><td><code>*** SANITY PASSED ***</code> + <code>$finish</code></td><td>통과. 종료 코드 0</td></tr>
+  <tr><td><code>*** SANITY FAILED ***</code> + <code>$fatal(1)</code></td><td>실패. 종료 코드 0이 아님</td></tr>
+  <tr><td><code>GLOBAL TIMEOUT</code></td><td>handshake 정지. <code>$fatal(1)</code></td></tr>
+</table>
+<p>스크립트는 종료 코드만 보면 되며 로그를 파싱할 필요가 없습니다.</p>
+
+<h2 id="sec21">4.3 실패 시 확인 순서</h2>
+<table>
+  <tr><th style="width:36%">증상</th><th>먼저 볼 것</th></tr>
+  <tr><td>SAN-001 VERSION / IDENTIFICATION FAIL</td><td>버스 또는 주소 디코드 고장. 나머지는 SKIP되므로 이것부터</td></tr>
+  <tr><td>구성 레지스터 (SAN-001 #3~5) FAIL</td><td>기대값 오류 가능성이 먼저. 파라미터를 바꿨다면 7.1</td></tr>
+  <tr><td>SAN-003 FAIL</td><td>리셋 경로 또는 레지스터 초기값</td></tr>
+  <tr><td>SAN-007 FAIL</td><td>regmap 읽기 비트 구성이나 파라미터 변경. 의도한 변경이면 기대값도 고침</td></tr>
+  <tr><td><code>irq asserted</code> 타임아웃</td><td>전송 미완료. <code>make wave</code>로 <code>m_sg_axi</code> / <code>m_src_axi</code> / <code>m_dest_axi</code>, <code>dut.i_transfer.i_dmac_sg.hwdesc_state</code>, <code>DBG_STATUS</code> 확인 (Architecture Spec 13장)</td></tr>
+  <tr><td><code>data</code> mismatch</td><td>처음 4개 불일치 주소·값이 출력됨. 주소 패턴으로 정렬 문제인지 길이 문제인지 구분</td></tr>
+  <tr><td>DESCRIPTOR_ID FAIL (SAN-005 #6, SAN-006 #7)</td><td>구현 특성 체크. <code>dmac_sg.v</code> / <code>util_axis_fifo.v</code> 변경 여부부터 (3.8)</td></tr>
+  <tr><td><code>GLOBAL TIMEOUT</code></td><td>바로 앞 출력으로 멈춘 TC 확인</td></tr>
+</table>
+
+<!-- ===================================================================== -->
+<h1 id="sec22">5 커버 범위와 한계</h1>
+<div class="note"><p>SOR v2.0.0에는 리셋값 전용 테스트가 없습니다(T-01, T-09가 일부만 읽음). 회귀로 계속 확인되는 리셋값의 근거는 이 TB입니다. 무엇을 확인했는지와 함께 무엇을 확인하지 않았는지를 이 장에 적습니다.</p></div>
+<h2 id="sec23">5.1 커버하는 것</h2>
+<table>
+  <tr><th style="width:16%">영역</th><th>내용</th><th style="width:15%">TC</th><th style="width:22%">SOR에서 더 보는 곳</th></tr>
+  <tr><td>버스 동작</td><td>AXI4-Lite 읽기·쓰기</td><td>SAN-001, 002</td><td>T-01</td></tr>
+  <tr><td>구성 상수</td><td>의도한 파라미터로 만들어짐</td><td>SAN-001</td><td>T-01</td></tr>
+  <tr><td>리셋값</td><td>레지스터 10개</td><td>SAN-003</td><td>T-09 (IRQ_MASK)</td></tr>
+  <tr><td>미구현 비트</td><td>8종 + 미정의 주소</td><td>SAN-007</td><td>T-02</td></tr>
+  <tr><td>SG 기본 전송</td><td>descriptor fetch → MM→MM 전송</td><td>SAN-004</td><td>T-03</td></tr>
+  <tr><td>체인</td><td><code>next_sg_addr</code> 3단 + prefetch(관측)</td><td><b>SAN-005</b></td><td>T-04, T-06</td></tr>
+  <tr><td>descriptor 형식</td><td>flags, id, 주소, <code>x_len</code> 해석</td><td>SAN-004, 005</td><td>T-03, T-04</td></tr>
+  <tr><td>burst 분할</td><td>128바이트 단위 (관측만)</td><td>SAN-004</td><td>T-07</td></tr>
+  <tr><td>인터럽트 경로</td><td>래치 → 마스크 → pending → W1C → 해제 (마스크 0x1만)</td><td>SAN-006</td><td>T-09</td></tr>
+  <tr><td>범위 초과 쓰기</td><td>목적지 뒤 16바이트 미기입</td><td>SAN-004, 005</td><td>모든 전송 테스트 (C3)</td></tr>
+</table>
+
+<h2 id="sec24">5.2 커버하지 않는 것 — 리셋값</h2>
+<p>SAN-003이 보지 않는 리셋값입니다. "SFR v2.0.0" 열은 일회성 측정 결과(P)입니다. 이 값들은 회귀에 포함되지 않으므로 RTL을 바꾸면 다시 확인해야 합니다.</p>
+<table>
+  <tr><th style="width:30%">레지스터</th><th style="width:22%">SFR v2.0.0</th><th>SOR v2.0.0에서</th></tr>
+  <tr><td><code>0x408</code> TRANSFER_SUBMIT</td><td>P = 0</td><td>T-10이 ENABLE = 0에서 쓴 뒤 읽음 (리셋값 아님)</td></tr>
+  <tr><td><code>0x418</code> X_LENGTH</td><td>P = 0 (upstream 문서는 7)</td><td>없음</td></tr>
+  <tr><td><code>0x420</code> / <code>0x424</code> *_STRIDE</td><td>P = 0</td><td>T-02가 쓰기 후 0 판정</td></tr>
+  <tr><td><code>0x42C</code> ACTIVE_TRANSFER_ID</td><td>P = 0</td><td>T-10, T-11이 전송 중·끈 뒤 값을 판정</td></tr>
+  <tr><td><code>0x430</code> STATUS</td><td>P = 0 (저장 소자 없음)</td><td>없음</td></tr>
+  <tr><td><code>0x448</code> TRANSFER_PROGRESS</td><td>P = 0</td><td>T-12가 전송 중·후 값을 판정</td></tr>
+  <tr><td><code>0x44C</code> / <code>0x450</code> PARTIAL_*</td><td>P = 0 (미구현)</td><td>T-02가 0 판정</td></tr>
+  <tr><td><code>0x454</code> DESCRIPTOR_ID</td><td>P = 0 (HWDESC = 0)</td><td>T-08이 SG 모드를 끈 뒤 0을 참고 체크</td></tr>
+  <tr><td><code>0x45C</code> FRAMELOCK_STRIDE</td><td>P = 0</td><td>T-02가 쓰기 후 0 판정</td></tr>
+  <tr><td><code>0x498</code> / <code>0x49C</code> CURRENT_*_HIGH</td><td>P = 0</td><td>없음</td></tr>
+  <tr><td><code>0x434</code> ~ <code>0x444</code> 디버그</td><td>비교 제외 (측정값만 기록)</td><td>관찰 기록 (T-11, T-12가 DBG_STATUS 기록)</td></tr>
+</table>
+
+<h2 id="sec25">5.3 커버하지 않는 것 — 기능</h2>
+<p><code>[B번호]</code>는 SOR v2.0.0 §2.6의 testbench 보강 목록이며, 보강 전에는 해당 판정이 보류됩니다.</p>
+<table>
+  <tr><th style="width:20%">영역</th><th style="width:32%">Sanity에서 빠진 내용</th><th>담당 SOR 테스트 (원래 ID)</th></tr>
+  <tr><td>Scatter</td><td>gather만 확인. scatter 미검증</td><td>T-05 (FUNC-003)</td></tr>
+  <tr><td>체인 길이</td><td>3만 확인</td><td>T-06 (FUNC-004)</td></tr>
+  <tr><td>TRANSFER_DONE 4개 초과</td><td>미확인</td><td>SOR에도 판정 없음 (T-10은 4개 이내, ID 재사용 때 clear만 확인)</td></tr>
+  <tr><td>전송 길이</td><td>64 / 128 / 256바이트만. 8의 배수가 아닌 길이 미확인</td><td>T-07 (FUNC-005~007, AXI-002, AXI-003) [B1]</td></tr>
+  <tr><td>주소 정렬</td><td>8바이트 정렬만</td><td>T-13 (FUNC-010, DESC-008)</td></tr>
+  <tr><td>4 KiB 경계</td><td>미확인</td><td>T-13 (AXI-004) [B1]</td></tr>
+  <tr><td>연속 전송</td><td>예약, TRANSFER_SUBMIT self-clear 타이밍</td><td>T-10 (REG-009~014, FUNC-008)</td></tr>
+  <tr><td>ENABLE = 0에서 제출</td><td>무시되는지 미확인</td><td>T-10 1단계 (REG-011)</td></tr>
+  <tr><td>descriptor별 인터럽트</td><td>중간 descriptor의 <code>flags[1]</code></td><td>T-08 (DESC-005, IRQ-001)</td></tr>
+  <tr><td>DESCRIPTOR_ID 전송 중 추적</td><td>완료 후 값만 봄</td><td>T-08 (DESC-006, REG-016) [B6]</td></tr>
+  <tr><td>마스크 조합</td><td><code>IRQ_MASK = 0x1</code>만</td><td>T-09 (IRQ-002~005)</td></tr>
+  <tr><td>ENABLE = 0 (전송 도중)</td><td>지워지는 값과 남는 값</td><td>T-11 (REG-006, REG-024) [B6]</td></tr>
+  <tr><td>PAUSE</td><td>멈춘 자리부터 재개, 체인 PAUSE 제약</td><td>T-12 (REG-008, REG-018) [B6]</td></tr>
+  <tr><td>전송 중 관측</td><td>TRANSFER_PROGRESS</td><td>T-12 (REG-018)</td></tr>
+  <tr><td>전송 중 관측</td><td>CURRENT_*_ADDRESS</td><td>SOR에서도 제외 (REG-017)</td></tr>
+  <tr><td>전송 중 관측</td><td>DBG_STATUS</td><td>T-11, T-12 — 관찰 기록 (REG-024)</td></tr>
+  <tr><td>RO 쓰기 · WSTRB</td><td>RO 레지스터 쓰기, 부분 바이트 쓰기</td><td>T-02 (REG-019, REG-023)</td></tr>
+  <tr><td>backpressure</td><td>메모리 모델이 지연 없이 응답 (6.4)</td><td>T-14 (AXI-005) [B4]</td></tr>
+  <tr><td>AXI 규칙</td><td>assertion 없음. AxCACHE 출력 미확인</td><td>T-14 (AXI-007) + 공통 조건 C5 [B1]</td></tr>
+  <tr><td>다중 outstanding</td><td>메모리 모델이 1개만 받음</td><td>SOR에서도 제외 (AXI-006)</td></tr>
+  <tr><td>에러 응답</td><td>RRESP/BRESP 에러, 잘못된 descriptor</td><td>T-15 (ERR-001~004) [B3]</td></tr>
+  <tr><td>커버리지</td><td>측정 안 함</td><td>SOR에서도 제외 (COV-001)</td></tr>
+</table>
+<div class="info"><p><b>T-07(전송 길이)은 이 구성에서 특히 중요합니다.</b> 소스와 목적지가 모두 AXI-MM일 때만 1바이트 단위 길이가 가능하며, ADI 공식 testbench는 이 조합을 검증하지 않습니다(두 구성 모두 한쪽이 AXI-Stream).</p>
+<p><b>리셋 관련은 Sanity와 SOR 어느 쪽에도 추가하지 않습니다</b>(2026-10-06 팀 결정). v1.0.0 SOR의 [3-1 Reset / Clock]은 "Sanity Test에서 커버됨 · 해당 사항 없음"으로 정리되었고 RST 요구사항 6건은 삭제되었습니다. 5.2의 값은 SFR v2.0.0에서 일회성으로 측정해 확정했지만, 회귀에는 없습니다.</p></div>
+
+<h2 id="sec26">5.4 SOR 연계 — Sanity TC → SOR v2.0.0 테스트</h2>
+<p>"같은 동작"은 Sanity와 SOR 테스트가 같은 값을 보는 경우, "일부 겹침"은 Sanity가 SOR 테스트의 일부만 보는 경우입니다.</p>
+<table>
+  <tr><th style="width:10%">TC</th><th style="width:40%">같은 동작 (원래 ID)</th><th>일부 겹침 (원래 ID)</th></tr>
+  <tr><td>SAN-001</td><td>T-01 (REG-001, 002, 004, 005, 020)</td><td>T-14 — 레지스터 값만, 버스 신호 아님 (AXI-007)</td></tr>
+  <tr><td>SAN-002</td><td>T-01 (REG-003)</td><td>—</td></tr>
+  <tr><td>SAN-003</td><td>—</td><td>T-09 — IRQ_MASK 리셋값만 (IRQ-003). 나머지 9개는 SOR에 없음</td></tr>
+  <tr><td>SAN-007</td><td>T-02 (REG-021, REG-022)</td><td>T-13 — SG_ADDRESS 레지스터 하위 3비트만 (DESC-008)</td></tr>
+  <tr><td>SAN-004</td><td>T-03 (REG-007, 015, DESC-001~003, 007, FUNC-001, 009; AXI-001은 관측만)</td><td>T-07 — 128바이트 분할·순서 관측 (FUNC-006, 007) · T-10 — 완료 비트 세트만 (REG-013)</td></tr>
+  <tr><td>SAN-005</td><td>T-04 (DESC-004, FUNC-002; DESC-009는 관측만)</td><td>T-06 — 체인 길이 3만 (FUNC-004) · T-08 — 마지막 descriptor 인터럽트, 완료 후 DESCRIPTOR_ID (DESC-005, 006, REG-016)</td></tr>
+  <tr><td>SAN-006</td><td>—</td><td>T-09 — 마스크 0x1만 (IRQ-002~005) · T-08 — EOT 이벤트, 완료 후 DESCRIPTOR_ID (IRQ-001, DESC-006, REG-016)</td></tr>
+</table>
+<p>Sanity와 겹치지 않는 SOR 테스트: T-05, T-07(판정 부분), T-10(규칙·예약 부분), T-11, T-12, T-14(버스 신호), T-15. 이 테스트들은 Sanity 결과와 관계없이 처음부터 검증합니다.</p>
+<div class="note"><p><b>Sanity 결과를 SOR 테스트의 통과 근거로 쓰지 않습니다.</b> 위 표는 같은 확인을 한 번 해 보았다는 참고 정보입니다.</p></div>
+
+<h2 id="sec27">5.5 읽기·비교 규칙</h2>
+<table>
+  <tr><th style="width:14%">주소</th><th style="width:30%">레지스터</th><th style="width:14%">규칙</th><th>이유</th></tr>
+  <tr><td>0x434 ~ 0x444</td><td>CURRENT_DEST_ADDRESS, CURRENT_SRC_ADDRESS, DBG_STATUS, DBG_IDS0/1</td><td>기대값 비교 금지</td><td>고정 리셋값을 보장하지 않고, 값이 버스 handshake 타이밍에 따라 달라지며, DBG_IDS는 Gray 인코딩 (SFR §4.7)</td></tr>
+  <tr><td>0x450</td><td>PARTIAL_TRANSFER_ID</td><td><b>제약 해제</b></td><td>정리 후 미구현, 읽기 부작용 없음 (SFR §4.5.5). 정리 전 RTL에서는 읽기가 FIFO를 pop했으므로, 정리 전 RTL에 같은 테스트를 돌릴 때는 읽지 않음</td></tr>
+</table>
+<p>Sanity는 두 영역을 읽지 않습니다. SOR v2.0.0은 디버그 레지스터를 관찰 기록으로만 읽고(SOR §2.1), <code>0x44C</code>/<code>0x450</code>은 T-02에서 0을 판정합니다.</p>
+
+<!-- ===================================================================== -->
+<h1 id="sec28">6 TB 구조</h1>
+<h2 id="sec29">6.1 전체 구성</h2>
+<figure>
+<div class="ftitle">세 메모리 모델이 같은 메모리 배열을 공유해 MM→MM 경로 전체를 TB 안에서 검증한다</div>
+<svg viewBox="0 0 900 432">
+  <rect class="grp" x="8" y="8" width="884" height="416" rx="6"/>
+  <text x="20" y="27" class="md tt m">tb_sg_dma</text><text x="94" y="27" class="xs mu">(tb/tb_sg_dma.sv)</text>
+  <!-- left blocks -->
+  <rect class="bct" x="24" y="42" width="262" height="66" rx="4"/>
+  <text x="34" y="60" class="s tt m">initial : main</text><text x="34" y="76" class="xs">san_001 → 002 → 003 → 007 → 004 → 005 → 006</text>
+  <text x="34" y="90" class="xs mu">레지스터 계층 먼저, bus_ok = 0이면 SKIP</text><text x="34" y="102" class="xs mu">report() : 집계, 종료 코드 결정</text>
+  <rect class="bct" x="24" y="128" width="262" height="54" rx="4"/>
+  <text x="34" y="146" class="s tt m">AXI4-Lite master</text><text x="34" y="162" class="xs">axil_write / axil_read / check_reg</text>
+  <text x="34" y="175" class="xs mu">BRESP ≠ OKAY이면 현재 TC FAIL</text>
+  <rect class="bct" x="24" y="202" width="262" height="68" rx="4"/>
+  <text x="34" y="220" class="s tt m">Scoreboard</text><text x="34" y="236" class="xs">tc_begin / tc_end / tc_skip</text>
+  <text x="34" y="250" class="xs">check_eq / check_cond, check_copy / check_untouched</text><text x="34" y="263" class="xs mu">bus_ok : VERSION · IDENTIFICATION만 게이트</text>
+  <rect class="bct" x="24" y="290" width="262" height="44" rx="4"/>
+  <text x="34" y="308" class="s tt m">initial : global watchdog</text><text x="34" y="324" class="xs">#2_000_000 → $fatal(1)</text>
+  <rect class="bct" x="24" y="354" width="262" height="54" rx="4"/>
+  <text x="34" y="372" class="s tt m">descriptor / 메모리 helper</text><text x="34" y="388" class="xs">write_desc, fill_pattern, start_sg</text>
+  <text x="34" y="401" class="xs">wait_irq (50,000 클럭), clear_irq</text>
+  <path class="lnd" d="M 155 108 L 155 126" marker-end="url(#ag)"/>
+  <path class="lnd" d="M 155 182 L 155 200" marker-end="url(#ag)"/>
+  <!-- DUT -->
+  <rect class="top" x="330" y="42" width="200" height="300" rx="6"/>
+  <text x="344" y="62" class="md tt m">dut : sg_dma_top</text><text x="344" y="77" class="xs mu">rtl/sg_dma_top.v · 46 checks 대상</text>
+  <rect class="bct" x="344" y="92" width="172" height="30" rx="3"/><text x="354" y="111" class="s tt m">s_axi</text><text x="430" y="111" class="xs mu">레지스터</text>
+  <rect class="bct" x="344" y="132" width="172" height="30" rx="3"/><text x="354" y="151" class="s tt m">irq</text><text x="430" y="151" class="xs mu">level</text>
+  <rect class="bsg" x="344" y="186" width="172" height="30" rx="3"/><text x="354" y="205" class="s tt m">m_sg_axi</text><text x="440" y="205" class="xs mu">descriptor</text>
+  <rect class="bdp" x="344" y="236" width="172" height="30" rx="3"/><text x="354" y="255" class="s tt m">m_src_axi</text><text x="440" y="255" class="xs mu">source read</text>
+  <rect class="bdp" x="344" y="286" width="172" height="30" rx="3"/><text x="354" y="305" class="s tt m">m_dest_axi</text><text x="440" y="305" class="xs mu">dest write</text>
+  <path class="ln" d="M 286 155 L 304 155 L 304 107 L 342 107" marker-end="url(#a)"/>
+  <path class="lnr" d="M 344 147 L 316 147 L 316 70 L 288 70" marker-end="url(#ar)"/><text x="318" y="64" class="xs red">irq</text>
+  <!-- slaves -->
+  <rect class="bw" x="600" y="186" width="250" height="30" rx="3"/><text x="610" y="205" class="s m">u_sg_mem : axi_rd_slave "SG"</text>
+  <rect class="bw" x="600" y="236" width="250" height="30" rx="3"/><text x="610" y="255" class="s m">u_src_mem : axi_rd_slave "SRC"</text>
+  <rect class="bw" x="600" y="286" width="250" height="30" rx="3"/><text x="610" y="305" class="s m">u_dst_mem : axi_wr_slave "DST"</text>
+  <path class="lns" d="M 516 201 L 598 201" marker-end="url(#as)"/><text x="540" y="195" class="xs sgc">AR / R</text>
+  <path class="lno" d="M 516 251 L 598 251" marker-end="url(#ao)"/><text x="540" y="245" class="xs dpc">AR / R</text>
+  <path class="lno" d="M 516 301 L 598 301" marker-end="url(#ao)"/><text x="534" y="295" class="xs dpc">AW / W / B</text>
+  <!-- shared memory -->
+  <rect class="bct" x="600" y="346" width="250" height="62" rx="4"/>
+  <text x="610" y="364" class="s tt m">tb_mem_pkg</text><text x="610" y="380" class="xs">mem[] : 바이트 단위 연관 배열</text>
+  <text x="610" y="393" class="xs">mem_write8/64, mem_read8, mem_written, mem_clear</text>
+  <path class="lnd" d="M 850 201 L 872 201 L 872 377 L 852 377"/><path class="lnd" d="M 850 251 L 872 251"/><path class="lnd" d="M 850 301 L 872 301"/>
+  <text x="764" y="340" class="xs mu">공유 메모리</text>
+  <path class="lnd" d="M 286 381 L 598 381" marker-end="url(#ag)"/><text x="400" y="375" class="xs mu">descriptor·패턴 기록 / 결과 비교</text>
+</svg>
+<figcaption>Figure 2. Sanity testbench 구성. 파랑 = descriptor 경로, 주황 = 데이터 경로, 빨강 = 인터럽트, 점선 = task 호출과 공유 메모리 접근.</figcaption>
+</figure>
+<p>세 메모리 모델은 <code>tb_mem_pkg</code>의 같은 연관 배열(주소 → 바이트)을 씁니다. TB가 <code>mem_write64()</code>로 쓴 descriptor는 SG 포트로 읽히고, 소스에 쓴 패턴은 SRC 포트로 읽히며, DST 포트가 쓴 데이터는 TB가 <code>mem_read8()</code>로 비교합니다. 별도 BFM 없이 MM→MM 경로 전체를 확인할 수 있습니다. <code>mem_written()</code>은 그 주소가 한 번이라도 쓰였는지를 돌려주므로, 초기화되지 않은 영역이 우연히 기대값과 같은 경우와 실제로 쓰인 경우를 구분합니다. guard 체크가 이 기능에 의존합니다.</p>
+
+<h2 id="sec30">6.2 Scoreboard</h2>
+<table>
+  <tr><th style="width:36%">task / function</th><th>역할</th></tr>
+  <tr><td><code>tc_begin(name, desc)</code></td><td>TC 시작, 카운터 초기화</td></tr>
+  <tr><td><code>tc_end()</code></td><td>TC 결과를 큐에 저장</td></tr>
+  <tr><td><code>tc_skip(name, desc, why)</code></td><td>SKIP 기록</td></tr>
+  <tr><td><code>check_eq(name, got, exp)</code></td><td>32비트 값 비교 (<code>===</code>, X도 불일치)</td></tr>
+  <tr><td><code>check_cond(name, cond, detail)</code></td><td>조건 판정</td></tr>
+  <tr><td><code>check_reg(name, addr, exp)</code></td><td>읽기 + 비교</td></tr>
+  <tr><td><code>check_copy(src, dst, len, tag)</code></td><td>바이트 비교. 목적지가 쓰이지 않았으면 불일치</td></tr>
+  <tr><td><code>check_untouched(addr, len, tag)</code></td><td>guard 영역 미기입 확인</td></tr>
+  <tr><td><code>report()</code></td><td>요약 출력, 종료 코드 결정</td></tr>
+</table>
+<p><code>pad()</code>(tb_sg_dma.sv:200~204)는 xsim이 <code>string</code>에 <code>%-Ns</code> 좌측 정렬을 적용하지 않아 출력 열을 맞추기 위해 둔 함수입니다.</p>
+
+<h2 id="sec31">6.3 AXI4-Lite master</h2>
+<p><code>axil_write</code>(tb_sg_dma.sv:261)는 AW와 W를 동시에 구동하고 두 handshake가 끝날 때까지 기다린 뒤 B를 받습니다. <code>BRESP</code>가 OKAY가 아니면 현재 TC의 FAIL로 기록합니다. 이 IP는 에러 응답을 내지 않으므로 평소에는 동작하지 않는 검사이며, 레지스터 접근에서 에러 응답이 나오기 시작하면 바로 드러나게 하는 장치입니다. WSTRB는 항상 <code>4'hF</code>입니다.</p>
+<pre>if (s_axi_bresp !== 2'b00) begin
+  cur_fail++;
+  $display("    [FAIL] AXI-Lite write resp : addr=0x%03h bresp=%0d", addr, s_axi_bresp);
+end</pre>
+
+<h2 id="sec32">6.4 메모리 모델의 제약</h2>
+<table>
+  <tr><th style="width:30%">항목</th><th>현재 동작 (<code>tb/axi_mem_slave.sv</code>)</th><th style="width:22%">영향을 받는 SOR</th></tr>
+  <tr><td>outstanding</td><td>포트당 1개</td><td>AXI-006 제외 사유</td></tr>
+  <tr><td>burst 형식</td><td>INCR만</td><td>—</td></tr>
+  <tr><td>응답</td><td>RRESP/BRESP 항상 OKAY</td><td>T-15 [B3]</td></tr>
+  <tr><td>지연</td><td>READY 지연 없음</td><td>T-14 [B4]</td></tr>
+  <tr><td>읽지 않은 주소</td><td><code>mem_read8()</code>는 0 반환</td><td>T-15 (0 descriptor)</td></tr>
+  <tr><td>초기화</td><td><code>mem_clear()</code> 함수는 있으나 Sanity는 호출하지 않음</td><td>[B5] 반복 시험</td></tr>
+</table>
+
+<!-- ===================================================================== -->
+<h1 id="sec33">7 유지보수</h1>
+<h2 id="sec34">7.1 파라미터를 바꿨을 때</h2>
+<table>
+  <tr><th style="width:30%">sg_dma_top 파라미터</th><th>고칠 기대값·코드</th></tr>
+  <tr><td><code>ADDR_WIDTH</code> 32 → 64</td><td>SAN-007 체크 6~8 (HIGH 레지스터가 RW가 됨), TB <code>AW</code> localparam (SFR §10)</td></tr>
+  <tr><td><code>AXI_AXCACHE</code> / <code>AXI_AXPROT</code></td><td><code>EXP_INTERFACE_DESCRIPTION_2</code></td></tr>
+  <tr><td><code>DATA_WIDTH</code></td><td><code>EXP_INTERFACE_DESCRIPTION_1</code>, SAN-007 정렬 체크, burst beat 수, TB <code>DW</code>. <b>64 이외는 검증되지 않음</b>(32에서 AXI 위반, SFR §11 #3)</td></tr>
+  <tr><td><code>MAX_BYTES_PER_BURST</code></td><td><code>EXP_INTERFACE_DESCRIPTION_1</code>, burst 분할 로그</td></tr>
+  <tr><td><code>LENGTH_WIDTH</code></td><td>Sanity 기대값 변경 없음 (X_LENGTH 폭은 SOR T-02/T-07)</td></tr>
+  <tr><td><code>FIFO_SIZE</code></td><td><code>ID_WIDTH</code> → 디버그 레지스터 폭 (Sanity 체크 없음)</td></tr>
+  <tr><td><code>ID</code></td><td><code>EXP_PERIPHERAL_ID</code></td></tr>
+  <tr><td><code>AXI_ID_WIDTH</code></td><td>TB <code>IDW</code> localparam</td></tr>
+</table>
+<p>SAN-007 체크 1, 2, 9, 10(framelock, cyclic, 2D)은 파라미터가 아니라 RTL에서 제거된 기능을 보므로 파라미터 변경으로 바뀌지 않습니다. 그 기능을 RTL에 다시 넣으면 해당 체크를 고칩니다. <code>INTERFACE_DESCRIPTION_1</code>은 <code>DATA_WIDTH</code>와 <code>MAX_BYTES_PER_BURST</code> 변경을 반영하므로, 바꿨는데 값이 그대로면 빌드에 반영되지 않은 것입니다. 파라미터를 바꾸면 SOR v2.0.0의 기대값(T-01, T-02, T-03 등)도 함께 고칩니다.</p>
+
+<h2 id="sec35">7.2 체크를 추가할 때</h2>
+<table>
+  <tr><th style="width:52%">규칙</th><th>이유</th></tr>
+  <tr><td>리셋값 체크는 SAN-003에만</td><td>쓰기가 일어나기 전에 실행되도록 순서가 고정됨</td></tr>
+  <tr><td>디버그 레지스터(<code>0x434</code> ~ <code>0x444</code>) 기대값 비교 금지</td><td>5.5</td></tr>
+  <tr><td>ADI가 보장하지 않은 동작을 체크하면 "구현 특성 체크"로 표시</td><td>실패 시 RTL 결함으로 오해하지 않도록 (3.8)</td></tr>
+  <tr><td>여러 단계의 시퀀스가 필요한 확인은 SOR 테스트로</td><td>실행 시간과 자동 판정 조건</td></tr>
+  <tr><td>TB 헤더 주석의 체크 수를 함께 수정</td><td>문서·로그와 불일치 방지 (과거에 실제로 어긋남)</td></tr>
+</table>
+<p>TB 헤더(tb_sg_dma.sv:5~13)에 TC별 체크 수와 합계가 있습니다. 로그의 <code>(46/46 checks)</code>와 비교하면 누락을 바로 알 수 있습니다.</p>
+
+<h2 id="sec36">7.3 문서 동기화</h2>
+<table>
+  <tr><th style="width:36%">변경</th><th>같이 고칠 것</th></tr>
+  <tr><td>기대값</td><td>SFR v2.0.0 §3 · §4 · 부록 A, 해당 SOR 테스트의 통과 기준</td></tr>
+  <tr><td>체크 추가·삭제</td><td>이 문서 2.1 · 3장 · 부록 B, TB 헤더</td></tr>
+  <tr><td>커버 범위 변화</td><td>이 문서 5장, SOR v2.0.0 3장 "관련 Sanity" 열</td></tr>
+  <tr><td>구현 특성 체크 처리 방식</td><td>이 문서 2.3 · 3.8 · 4.3 · 부록 B, TB 헤더</td></tr>
+  <tr><td>레지스터 명칭</td><td>SFR, TB localparam, 체크 문자열</td></tr>
+  <tr><td>RTL 파일·경로</td><td><code>filelists/rtl.f</code>, 이 문서 4.1, SFR 부록 C</td></tr>
+</table>
+
+<!-- ===================================================================== -->
+<h1 id="sec37">부록 A 실측 로그 전문</h1>
+<p>2026-10-19 <code>make clean &amp;&amp; make sim</code> 실행 결과(<code>xsim/xsim.log</code>)입니다. 첫 줄 배너만 정리 전과 다르고, 체크 결과와 버스 트랜잭션 시각은 2026-10-06 로그와 같습니다.</p>
+<pre class="small" style="break-inside:auto;">==========================================================
+  SG DMA sanity test   (SGDMA-SANITY-rel-v2.0.0)
+==========================================================
+
+[SAN-001] Register identity
+    [ ok ] VERSION                              0x00040565
+    [ ok ] IDENTIFICATION                       0x444d4143
+    [ ok ] PERIPHERAL_ID                        0x00000000
+    [ ok ] INTERFACE_DESCRIPTION_1              0x38070303
+    [ ok ] INTERFACE_DESCRIPTION_2              0x00000000
+
+[SAN-002] Scratch R/W
+    [ ok ] SCRATCH = 0xA5A55A5A                 0xa5a55a5a
+    [ ok ] SCRATCH = 0x5A5AA5A5                 0x5a5aa5a5
+    [ ok ] SCRATCH = 0x00000000                 0x00000000
+
+[SAN-003] Reset defaults
+    [ ok ] CONTROL                              0x00000000
+    [ ok ] IRQ_MASK                             0x00000003
+    [ ok ] IRQ_PENDING                          0x00000000
+    [ ok ] IRQ_SOURCE                           0x00000000
+    [ ok ] FLAGS                                0x00000002
+    [ ok ] TRANSFER_DONE                        0x00000000
+    [ ok ] TRANSFER_ID                          0x00000000
+    [ ok ] DEST_ADDRESS                         0x00000000
+    [ ok ] SRC_ADDRESS                          0x00000000
+    [ ok ] SG_ADDRESS                           0x00000000
+
+[SAN-007] Parameter-masked bits
+    [ ok ] CONTROL[3] masked (FRAMELOCK=0)      0x00000007
+    [ ok ] FLAGS[0] masked (DMA_CYCLIC=0)       0x00000006
+    [ ok ] DEST_ADDRESS 8B aligned              0xfffffff8
+    [ ok ] SRC_ADDRESS 8B aligned               0xfffffff8
+    [ ok ] SG_ADDRESS 8B aligned                0xfffffff8
+    [ ok ] DEST_ADDRESS_HIGH tied 0             0x00000000
+    [ ok ] SRC_ADDRESS_HIGH tied 0              0x00000000
+    [ ok ] SG_ADDRESS_HIGH tied 0               0x00000000
+    [ ok ] Y_LENGTH tied 0 (2D=0)               0x00000000
+    [ ok ] FRAMELOCK_CONFIG tied 0              0x00000000
+    [ ok ] unmapped reads return 0
+    restored CONTROL / FLAGS / address registers
+
+[SAN-004] Single descriptor copy (256 B)
+    desc @0x00001000 : id=0xa0 flags=11 src=0x00010000 dst=0x00020000 len=256 next=0x00000000
+[3195000]   SG AR  addr=0x00001000 beats=6 size=8B
+[3315000]  SRC AR  addr=0x00010000 beats=16 size=8B
+[3495000]  DST AW  addr=0x00020000 beats=16 size=8B
+[3495000]  SRC AR  addr=0x00010080 beats=16 size=8B
+[3705000]  DST AW  addr=0x00020080 beats=16 size=8B
+    [ ok ] SAN-004 : irq asserted
+    [ ok ] data : 256 bytes 0x00010000 -&gt; 0x00020000
+    [ ok ] tail : no overrun past 0x00020100
+    [ ok ] TRANSFER_DONE bit set
+
+[SAN-005] 3-descriptor chain, gather
+    desc @0x00001100 : id=0xb0 flags=00 src=0x00011000 dst=0x00021000 len=128 next=0x00001140
+    desc @0x00001140 : id=0xb1 flags=00 src=0x00013000 dst=0x00021080 len=256 next=0x00001180
+    desc @0x00001180 : id=0xb2 flags=11 src=0x00015000 dst=0x00021180 len=64 next=0x00000000
+[4215000]   SG AR  addr=0x00001100 beats=6 size=8B
+[4295000]   SG AR  addr=0x00001140 beats=6 size=8B
+[4335000]  SRC AR  addr=0x00011000 beats=16 size=8B
+[4375000]   SG AR  addr=0x00001180 beats=6 size=8B
+[4515000]  DST AW  addr=0x00021000 beats=16 size=8B
+[4515000]  SRC AR  addr=0x00013000 beats=16 size=8B
+[4695000]  SRC AR  addr=0x00013080 beats=16 size=8B
+[4725000]  DST AW  addr=0x00021080 beats=16 size=8B
+[4875000]  SRC AR  addr=0x00015000 beats=8 size=8B
+[4915000]  DST AW  addr=0x00021100 beats=16 size=8B
+[5105000]  DST AW  addr=0x00021180 beats=8 size=8B
+    [ ok ] SAN-005 : irq asserted
+    [ ok ] seg0 : 128 bytes 0x00011000 -&gt; 0x00021000
+    [ ok ] seg1 : 256 bytes 0x00013000 -&gt; 0x00021080
+    [ ok ] seg2 : 64 bytes 0x00015000 -&gt; 0x00021180
+    [ ok ] tail : no overrun past 0x000211c0
+    [ ok ] DESCRIPTOR_ID = last of chain        0x000000b2
+
+[SAN-006] IRQ &amp; status
+    desc @0x00001200 : id=0xc5 flags=11 src=0x00018000 dst=0x00028000 len=64 next=0x00000000
+    [ ok ] IRQ_MASK = 0x1 (EOT unmasked)        0x00000001
+[5595000]   SG AR  addr=0x00001200 beats=6 size=8B
+[5715000]  SRC AR  addr=0x00018000 beats=8 size=8B
+[5815000]  DST AW  addr=0x00028000 beats=8 size=8B
+    [ ok ] SAN-006 : irq asserted
+    [ ok ] IRQ_PENDING[1] set
+    [ ok ] IRQ_PENDING cleared                  0x00000000
+    [ ok ] IRQ_SOURCE[0] survives W1C           0x00000001
+    [ ok ] irq de-asserted after W1C
+    [ ok ] DESCRIPTOR_ID                        0x000000c5
+
+==========================================================
+  SANITY SUMMARY
+==========================================================
+  SAN-001  Register identity                PASS  (5/5)
+  SAN-002  Scratch R/W                      PASS  (3/3)
+  SAN-003  Reset defaults                   PASS  (10/10)
+  SAN-007  Parameter-masked bits            PASS  (11/11)
+  SAN-004  Single descriptor copy (256 B)   PASS  (4/4)
+  SAN-005  3-descriptor chain, gather       PASS  (6/6)
+  SAN-006  IRQ &amp; status                     PASS  (7/7)
+----------------------------------------------------------
+  SANITY: 7 PASS / 0 FAIL / 0 SKIP     (46/46 checks)
+==========================================================
+*** SANITY PASSED ***
+$finish called at time : 6305 ns : File "/home/hrsc/Workspace/pro-a-sgdma-hrcho/tb/tb_sg_dma.sv" Line 669</pre>
+
+<h1 id="sec38">부록 B 체크 ↔ SFR 근거</h1>
+<p>46개 체크의 기대값 근거입니다. 기대값을 고칠 때는 양쪽을 같이 고칩니다. SFR 절 번호는 SFR rel-v2.0.0 기준이며 v1.1.0과 같습니다.</p>
+<table>
+  <tr><th style="width:10%">TC</th><th class="c" style="width:7%">#</th><th style="width:28%">체크</th><th style="width:16%">기대값</th><th style="width:12%">SFR</th><th>구분</th></tr>
+  <tr><td>SAN-001</td><td class="c">1</td><td>VERSION</td><td>0x0004_0565</td><td>4.1.1</td><td>게이트 (bus_ok)</td></tr>
+  <tr><td></td><td class="c">2</td><td>IDENTIFICATION</td><td>0x444D_4143</td><td>4.1.4</td><td>게이트 (bus_ok)</td></tr>
+  <tr><td></td><td class="c">3</td><td>PERIPHERAL_ID</td><td>0x0000_0000</td><td>4.1.2</td><td>구성 상수</td></tr>
+  <tr><td></td><td class="c">4</td><td>INTERFACE_DESCRIPTION_1</td><td>0x3807_0303</td><td>4.1.5</td><td>구성 상수</td></tr>
+  <tr><td></td><td class="c">5</td><td>INTERFACE_DESCRIPTION_2</td><td>0x0000_0000</td><td>4.1.6</td><td>구성 상수</td></tr>
+  <tr><td>SAN-002</td><td class="c">6~8</td><td>SCRATCH 3회</td><td>쓴 값</td><td>4.1.3</td><td></td></tr>
+  <tr><td>SAN-003</td><td class="c">9</td><td>CONTROL</td><td>0x0000_0000</td><td>4.3.1</td><td></td></tr>
+  <tr><td></td><td class="c">10</td><td>IRQ_MASK</td><td><b>0x0000_0003</b></td><td>4.2.1</td><td></td></tr>
+  <tr><td></td><td class="c">11</td><td>IRQ_PENDING</td><td>0x0000_0000</td><td>4.2.2</td><td></td></tr>
+  <tr><td></td><td class="c">12</td><td>IRQ_SOURCE</td><td>0x0000_0000</td><td>4.2.3</td><td></td></tr>
+  <tr><td></td><td class="c">13</td><td>FLAGS</td><td><b>0x0000_0002</b></td><td>4.4.3</td><td></td></tr>
+  <tr><td></td><td class="c">14</td><td>TRANSFER_DONE</td><td>0x0000_0000</td><td>4.5.1</td><td></td></tr>
+  <tr><td></td><td class="c">15</td><td>TRANSFER_ID</td><td>0x0000_0000</td><td>4.4.1</td><td></td></tr>
+  <tr><td></td><td class="c">16</td><td>DEST_ADDRESS</td><td>0x0000_0000</td><td>4.4.4</td><td></td></tr>
+  <tr><td></td><td class="c">17</td><td>SRC_ADDRESS</td><td>0x0000_0000</td><td>4.4.5</td><td></td></tr>
+  <tr><td></td><td class="c">18</td><td>SG_ADDRESS</td><td>0x0000_0000</td><td>4.6.1</td><td></td></tr>
+  <tr><td>SAN-007</td><td class="c">19</td><td>CONTROL[3]</td><td>0x0000_0007</td><td>4.3.1 / 4.8</td><td></td></tr>
+  <tr><td></td><td class="c">20</td><td>FLAGS[0]</td><td>0x0000_0006</td><td>4.4.3 / 4.8</td><td></td></tr>
+  <tr><td></td><td class="c">21~23</td><td>주소 3개 8바이트 정렬</td><td>0xFFFF_FFF8</td><td>4.4.4 / 4.6.1</td><td></td></tr>
+  <tr><td></td><td class="c">24~26</td><td>*_ADDRESS_HIGH 3개</td><td>0x0000_0000</td><td>4.8 / §10</td><td></td></tr>
+  <tr><td></td><td class="c">27</td><td>Y_LENGTH</td><td>0x0000_0000</td><td>4.8</td><td></td></tr>
+  <tr><td></td><td class="c">28</td><td>FRAMELOCK_CONFIG</td><td>0x0000_0000</td><td>4.8</td><td></td></tr>
+  <tr><td></td><td class="c">29</td><td>미정의 주소 2개</td><td>0x0000_0000</td><td>2.1</td><td></td></tr>
+  <tr><td>SAN-004</td><td class="c">30</td><td>irq asserted</td><td>—</td><td>§6</td><td></td></tr>
+  <tr><td></td><td class="c">31</td><td>data 256 B</td><td>바이트 일치</td><td>§5</td><td></td></tr>
+  <tr><td></td><td class="c">32</td><td>tail</td><td>미기입</td><td>—</td><td></td></tr>
+  <tr><td></td><td class="c">33</td><td>TRANSFER_DONE 비트</td><td>[3:0] ≠ 0</td><td>4.5.1</td><td></td></tr>
+  <tr><td>SAN-005</td><td class="c">34</td><td>irq asserted</td><td>—</td><td>6.2</td><td></td></tr>
+  <tr><td></td><td class="c">35~37</td><td>seg0 / seg1 / seg2</td><td>바이트 일치</td><td>§5</td><td></td></tr>
+  <tr><td></td><td class="c">38</td><td>tail</td><td>미기입</td><td>—</td><td></td></tr>
+  <tr><td></td><td class="c">39</td><td>DESCRIPTOR_ID</td><td>0x0000_00B2</td><td><b>4.6.2</b></td><td><b>구현 특성</b></td></tr>
+  <tr><td>SAN-006</td><td class="c">40</td><td>IRQ_MASK</td><td>0x0000_0001</td><td>4.2.1</td><td></td></tr>
+  <tr><td></td><td class="c">41</td><td>irq asserted</td><td>—</td><td>6.1</td><td></td></tr>
+  <tr><td></td><td class="c">42</td><td>IRQ_PENDING[1]</td><td>[1] = 1</td><td>4.2.2</td><td></td></tr>
+  <tr><td></td><td class="c">43</td><td>IRQ_PENDING clear</td><td>0x0000_0000</td><td>4.2.2</td><td></td></tr>
+  <tr><td></td><td class="c">44</td><td>IRQ_SOURCE[0] 잔존</td><td><b>0x0000_0001</b></td><td><b>4.2.3</b></td><td></td></tr>
+  <tr><td></td><td class="c">45</td><td>irq 해제</td><td>irq = 0</td><td>6.1</td><td></td></tr>
+  <tr><td></td><td class="c">46</td><td>DESCRIPTOR_ID</td><td>0x0000_00C5</td><td>4.6.2</td><td><b>구현 특성</b></td></tr>
+</table>
+<p>SFR의 근거 등급 M은 이 46개로 확인되는 값입니다. 39·46번은 측정값이지만 ADI가 보장한 동작이 아니므로 RTL이 바뀌면 같다는 보장이 없습니다.</p>
+
+<h1 id="sec39">부록 C 이력</h1>
+<h2 id="sec40">C.1 설계 결정 반영 (2026-10-06)과 현재 상태</h2>
+<table>
+  <tr><th class="c" style="width:4%">#</th><th style="width:26%">결정</th><th style="width:30%">TB 영향</th><th>2026-10-19 현재</th></tr>
+  <tr><td class="c">1</td><td>AXI_AXCACHE = 4'b0000 명시</td><td>기대값 불변 (46/46 + AXI 타임스탬프 19개 동일)</td><td><code>sg_dma_top</code> 파라미터</td></tr>
+  <tr><td class="c">2</td><td>ADDR_WIDTH = 32 확정</td><td><code>AW</code> localparam, SAN-007 체크 6~8</td><td>유지</td></tr>
+  <tr><td class="c">3</td><td>모듈명 통일</td><td>DUT 인스턴스 1줄</td><td><code>sg_dma_top</code> (2026-10-17)</td></tr>
+  <tr><td class="c">4</td><td>래퍼 파라미터 전부 명시</td><td>기대값 불변</td><td>top 병합으로 파라미터 9개</td></tr>
+  <tr><td class="c">5</td><td>AXI ID / LOCK 포트 노출</td><td>신호 선언 추가, 입력은 0 고정</td><td>유지</td></tr>
+  <tr><td class="c">6</td><td>레지스터 명칭 upstream 통일</td><td>localparam · 체크 문자열</td><td>유지</td></tr>
+  <tr><td class="c">7</td><td>Sanity 보강 2건</td><td>재조정 (C.2)</td><td>유지 (46 checks)</td></tr>
+</table>
+<h2 id="sec41">C.2 결정 7 재조정</h2>
+<p>원안은 <code>X_LENGTH</code>(0x418), <code>ACTIVE_TRANSFER_ID</code>(0x42C) 리셋값 체크를 SAN-003에 추가(46 → 48)하는 것이었습니다. 후속 논의에서 Sanity는 회귀 게이트 역할로 한정해 46 checks를 유지하고, SOR에서도 RST 요구사항 6건을 삭제했습니다. 2026-10-19 SFR v2.0.0이 두 값을 일회성으로 측정했습니다(둘 다 0, P). 회귀에는 추가하지 않았습니다.</p>
+<h2 id="sec42">C.3 TB 수정 이력</h2>
+<table>
+  <tr><th style="width:14%">날짜</th><th>내용</th></tr>
+  <tr><td>2026-10-01</td><td>초기 45 checks. <code>INTERFACE_DESCRIPTION_2</code> 기대값 <code>0x30</code>으로 FAIL → 측정값 <code>0x0</code>으로 정정</td></tr>
+  <tr><td>2026-10-01</td><td>SKIP 로직 수정 — 구성 레지스터 불일치가 전체 TC를 SKIP시키던 문제. <code>bus_ok</code> 도입</td></tr>
+  <tr><td>2026-10-01</td><td><code>pad()</code> 추가 — xsim의 <code>string</code> 좌측 정렬 미지원</td></tr>
+  <tr><td>2026-10-02</td><td>SAN-005에 DESCRIPTOR_ID 체크 추가 (45 → 46). AXI ID / LOCK 포트 신호 추가</td></tr>
+  <tr><td>2026-10-06</td><td>모듈명 · 레지스터 명칭 · 주석 정리</td></tr>
+  <tr><td>2026-10-17</td><td>DUT <code>sg_dma_top</code>, <code>tb/</code> 평탄화. RTL 정리 후 46/46, 로그 동일</td></tr>
+  <tr><td>2026-10-19</td><td>주석·배너 갱신 (문서 판 번호, 0x450·AXCACHE 설명, 미구현 기능 표기). 체크 로직 변경 없음</td></tr>
+</table>
+<p>2026-10-01의 두 사건이 이 TB의 설계 판단 두 가지를 만들었습니다. 기대값 오류가 전체 SKIP을 일으킨 일에서 <code>bus_ok</code> 게이트가 나왔고, 두 정적 분석이 같은 틀린 값에 도달한 일에서 SFR의 근거 등급 체계가 나왔습니다.</p>
+
+<h1>개정 이력</h1>
+<table>
+  <tr><th style="width:12%">판</th><th style="width:12%">날짜</th><th>내용</th></tr>
+  <tr><td>v0.2</td><td>2026-10-01</td><td>항목 정의서 — TC 7개 / 45 checks</td></tr>
+  <tr><td>rel-v1.0.0</td><td>2026-10-06</td><td>검증팀 인계본 — 46 checks 확정, 실측 로그, 커버 범위와 한계(5장), TB 구조·유지보수</td></tr>
+  <tr><td>rel-v1.1.0</td><td>2026-10-16</td><td>SOR(테스트 15개) 기준으로 연결 재정리, 구현 특성 체크 정의, 읽기·비교 금지 규칙 정리 (문서 내부 표기는 rel-v2.0.0이었으나 파일명 기준 v1.1.0으로 정리)</td></tr>
+  <tr><td><b>rel-v2.0.0</b></td><td><b>2026-10-19</b></td><td>정리된 RTL(<code>rtl/sg_dma_top.v</code>)·TB 경로 기준으로 다시 작성. 2026-10-19 실행 로그, 0x450 제약 해제, 리셋값 P 측정 반영, 파라미터 유지보수 표를 top 파라미터 9개 기준으로 갱신, 메모리 모델 제약 명시, TB 구조 그림 갱신. 비유 표현 삭제. TB는 주석·배너만 수정</td></tr>
+</table>
+
+</body></html>

@@ -12,7 +12,7 @@
 //   ----------------------------------------------
 //   Total                               (46 checks)
 //
-//   Ref  : SGDMA-SANITY-v1.0, SGDMA-SFR-v1.0
+//   Ref  : SGDMA-SANITY-rel-v2.0.0, SGDMA-SFR-rel-v2.0.0
 //   Exit : non-zero on any failure (regression gate)
 // ============================================================================
 `timescale 1ns/1ps
@@ -52,20 +52,19 @@ module tb_sg_dma;
   localparam logic [10:0] REG_UNMAPPED_A              = 11'h0F0;
   localparam logic [10:0] REG_UNMAPPED_B              = 11'h600;
 
-  // ---------------- expected values (SGDMA-SFR-v1.0) ----------------
+  // ---------------- expected values (SGDMA-SFR-rel-v2.0.0) ----------------
   localparam logic [31:0] EXP_VERSION                 = 32'h0004_0565;
   localparam logic [31:0] EXP_IDENTIFICATION          = 32'h444D_4143;  // "DMAC"
-  // sg_dma_top passes ID = 0 (wrapper parameter default) to axi_dmac.
+  // sg_dma_top parameter ID = 0 (default) -> PERIPHERAL_ID.
   localparam logic [31:0] EXP_PERIPHERAL_ID           = 32'h0000_0000;
   localparam logic [31:0] EXP_INTERFACE_DESCRIPTION_1 = 32'h3807_0303;  // measured 2026-10-01
-  // AXI_AXCACHE = 4'b0000 (Device Non-bufferable), AXI_AXPROT = 3'b000.
-  // Explicitly specified in sg_dma_top as of 2026-10-06 (team decision); before
-  // that they relied on axi_dmac's own defaults and measured the same value.
-  // NOTE: axi_dmac_regmap declares a LOCAL default of 4'b0011 - do NOT compute
-  // the expected value from that file.  Two independent reviews did exactly
-  // that, both got 0x30, and both were wrong.
+  // AXI_AXCACHE = 4'b0000 (Device Non-bufferable), AXI_AXPROT = 3'b000,
+  // set by sg_dma_top parameters (team decision 2026-10-06).
+  // History: the pre-reduction axi_dmac_regmap declared a LOCAL default of
+  // 4'b0011; two reviews computed 0x30 from it and both were wrong.  Always
+  // take the expected value from the sg_dma_top parameters.
   localparam logic [31:0] EXP_INTERFACE_DESCRIPTION_2 = 32'h0000_0000;
-  localparam logic [31:0] EXP_FLAGS_RESET             = 32'h0000_0002;  // LAST defaults to 1
+  localparam logic [31:0] EXP_FLAGS_RESET             = 32'h0000_0002;  // FLAGS[1] resets to 1
 
   // ---------------- clock / reset ----------------
   logic clk    = 1'b0;
@@ -461,19 +460,20 @@ module tb_sg_dma;
   //   documented expected value, a naive "RW register write / read-back" test
   //   reports this correct behaviour as a defect.
   //
-  //   0x450 (PARTIAL_TRANSFER_ID) is deliberately NOT read here - a read pops
-  //   the internal FIFO.  See SFR map 4.5.5.
+  //   0x450 (PARTIAL_TRANSFER_ID) is not read here.  In the pre-reduction RTL
+  //   a read popped an internal FIFO; in the current RTL the register is not
+  //   built and reads 0 without side effects.  See SFR map 4.5.5.
   // ==========================================================================
   task automatic san_007();
     logic [31:0] ra, rb;
 
     tc_begin("SAN-007", "Parameter-masked bits");
 
-    // FRAMELOCK=0 -> CONTROL[3] write-masked
+    // framelock not built -> CONTROL[3] reads 0
     axil_write(REG_CONTROL, 32'hFFFF_FFFF);
     check_reg("CONTROL[3] masked (FRAMELOCK=0)", REG_CONTROL, 32'h0000_0007);
 
-    // DMA_CYCLIC=0 -> FLAGS[0] write-masked
+    // cyclic mode not built -> FLAGS[0] reads 0
     axil_write(REG_FLAGS, 32'hFFFF_FFFF);
     check_reg("FLAGS[0] masked (DMA_CYCLIC=0)", REG_FLAGS, 32'h0000_0006);
 
@@ -493,7 +493,7 @@ module tb_sg_dma;
     axil_write(REG_SG_ADDR_HIGH, 32'hFFFF_FFFF);
     check_reg("SG_ADDRESS_HIGH tied 0",   REG_SG_ADDR_HIGH,   32'h0000_0000);
 
-    // DMA_2D_TRANSFER=0 / FRAMELOCK=0
+    // 2D transfer / framelock not built
     check_reg("Y_LENGTH tied 0 (2D=0)",  REG_Y_LENGTH,         32'h0000_0000);
     check_reg("FRAMELOCK_CONFIG tied 0", REG_FRAMELOCK_CONFIG, 32'h0000_0000);
 
@@ -675,7 +675,7 @@ module tb_sg_dma;
   // ==========================================================================
   initial begin
     $display("==========================================================");
-    $display("  SG DMA sanity test   (SGDMA-SANITY-v1.0)");
+    $display("  SG DMA sanity test   (SGDMA-SANITY-rel-v2.0.0)");
     $display("==========================================================");
 
     repeat (10) @(posedge clk);

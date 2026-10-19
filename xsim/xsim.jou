@@ -3,8 +3,8 @@
 # SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
 # IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
 # SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
-# Start of session at: Sat Oct 17 19:32:23 2026
-# Process ID         : 56405
+# Start of session at: Mon Oct 19 21:44:51 2026
+# Process ID         : 6325
 # Current directory  : /home/hrsc/Workspace/pro-a-sgdma-hrcho/xsim
 # Command line       : xsim -log xsim.log -mode tcl -source {xsim.dir/tb_sg_dma_snap/xsim_script.tcl}
 # Log file           : /home/hrsc/Workspace/pro-a-sgdma-hrcho/xsim/xsim.log
@@ -19,7 +19,7 @@
 # Host memory        : 6048 MB
 # Swap memory        : 2147 MB
 # Total Virtual      : 8195 MB
-# Available Virtual  : 6407 MB
+# Available Virtual  : 6765 MB
 #-----------------------------------------------------------
 source xsim.dir/tb_sg_dma_snap/xsim_script.tcl
 open_wave_config /home/hrsc/Workspace/pro-a-sgdma-hrcho/xsim/tb_sg_dma_snap.wcfg
